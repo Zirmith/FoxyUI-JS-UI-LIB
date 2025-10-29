@@ -9,7 +9,7 @@
     colors: {
       windowBg: "#0f0f0f", text: "#baffda", header: "#222",
       tabActive: "#222", tabInactive: "#aaa",
-      toastInfo: "#6ec6ff", toastSuccess: "#7aff7a", toastError: "#ff7a7a",
+      tabHover: "#333", toastInfo: "#6ec6ff", toastSuccess: "#7aff7a", toastError: "#ff7a7a",
       inputBg: "#1a1a1a", inputBorder: "#444", buttonBg: "#333",
       buttonHover: "#444", buttonText: "#fff", placeholder: "#888"
     },
@@ -23,28 +23,161 @@
   // ---------- STYLE ----------
   const style = document.createElement("style");
   style.textContent = `
-    .foxy-window { position:fixed; top:80px; left:80px; width:520px; height:420px;
-      background:${_settings.colors.windowBg}; color:${_settings.colors.text};
-      font-family:${_settings.font}; border:1px solid #555; border-radius:10px;
-      box-shadow:0 0 25px rgba(0,0,0,0.6); z-index:999999; display:flex; flex-direction:column; resize:both; overflow:hidden; transition: transform .15s;}
-    .foxy-header { background:${_settings.colors.header}; padding:6px 10px; display:flex; align-items:center; gap:8px; cursor:grab; border-bottom:1px solid #333; user-select:none; }
-    .foxy-header:active { cursor:grabbing; }
-    .foxy-title { flex:1; font-weight:700; color:${_settings.colors.text}; }
-    .foxy-tabbar { display:flex; background:#191919; border-bottom:1px solid #333; gap:4px; padding:4px; flex-wrap:wrap; }
-    .foxy-tab { padding:6px 10px; cursor:pointer; color:${_settings.colors.tabInactive}; border-radius:6px; user-select:none; display:flex; align-items:center; gap:4px; transition:0.15s; }
-    .foxy-tab.active { background:${_settings.colors.tabActive}; color:#fff; }
-    .foxy-tab img { width:16px; height:16px; vertical-align:middle; }
-    .foxy-content { flex:1; background:${_settings.colors.windowBg}; padding:10px; overflow:auto; white-space:pre-wrap; color:${_settings.colors.text}; display:flex; flex-direction:column; }
-    .foxy-footer { display:flex; gap:8px; padding:8px; background:${_settings.colors.header}; border-top:1px solid #333; flex-wrap:wrap; }
-    .foxy-toast-wrap { position:fixed; right:18px; bottom:18px; display:flex; flex-direction:column; gap:8px; z-index:1000001; }
-    .foxy-toast { background:rgba(30,30,30,.98); border:1px solid #444; border-radius:8px; padding:8px 12px; min-width:180px; display:flex; align-items:center; gap:8px; box-shadow:0 4px 14px rgba(0,0,0,.4); }
+    .foxy-window {
+      position: fixed;
+      top: 80px; left: 80px;
+      width: 520px; height: 420px;
+      background:${_settings.colors.windowBg};
+      color:${_settings.colors.text};
+      font-family:${_settings.font};
+      border:1px solid #555;
+      border-radius:10px;
+      box-shadow:0 0 25px rgba(0,0,0,0.6);
+      display:flex;
+      flex-direction:column;
+      resize: both;
+      overflow: hidden;
+      transition: transform .15s, background .2s, color .2s;
+      z-index:999999;
+    }
+    .foxy-header {
+      background:${_settings.colors.header};
+      padding:6px 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      cursor: grab;
+      border-bottom: 1px solid #333;
+      user-select: none;
+    }
+    .foxy-header:active { cursor: grabbing; }
+    .foxy-title {
+      flex: 1;
+      font-weight:700;
+      color:${_settings.colors.text};
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .foxy-controls span {
+      cursor: pointer;
+      font-weight: 700;
+      padding: 0 6px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .foxy-controls span:hover { background: rgba(255,255,255,0.1); }
+    
+    .foxy-tabbar {
+      display:flex;
+      overflow-x:auto;
+      overflow-y:hidden;
+      background:#191919;
+      border-bottom:1px solid #333;
+      gap:4px;
+      padding:4px 2px;
+      scrollbar-width: thin;
+      scrollbar-color: #444 #111;
+    }
+    .foxy-tabbar::-webkit-scrollbar { height:6px; }
+    .foxy-tabbar::-webkit-scrollbar-thumb { background:#444; border-radius:3px; }
+    .foxy-tabbar::-webkit-scrollbar-track { background:#111; }
+    
+    .foxy-tab {
+      padding:6px 12px;
+      cursor:pointer;
+      color:${_settings.colors.tabInactive};
+      border-radius:6px;
+      user-select:none;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .foxy-tab:hover { background:${_settings.colors.tabHover}; }
+    .foxy-tab.active {
+      background:${_settings.colors.tabActive};
+      color:#fff;
+      font-weight: 600;
+    }
+    .foxy-tab img { width:16px; height:16px; object-fit: contain; vertical-align:middle; }
+    
+    .foxy-content {
+      flex:1;
+      background:${_settings.colors.windowBg};
+      padding:12px;
+      overflow:auto;
+      white-space: pre-wrap;
+      color:${_settings.colors.text};
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .foxy-footer {
+      display:flex;
+      gap:8px;
+      padding:8px;
+      background:${_settings.colors.header};
+      border-top:1px solid #333;
+      flex-wrap: wrap;
+    }
+    
+    .foxy-toast-wrap {
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      z-index:1000001;
+    }
+    .foxy-toast {
+      background:rgba(30,30,30,.98);
+      border:1px solid #444;
+      border-radius:8px;
+      padding:8px 12px;
+      min-width:180px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 4px 14px rgba(0,0,0,.4);
+      font-size:13px;
+      transition: all 0.2s;
+    }
     .foxy-toast.info{color:${_settings.colors.toastInfo};border-left:4px solid ${_settings.colors.toastInfo};}
     .foxy-toast.success{color:${_settings.colors.toastSuccess};border-left:4px solid ${_settings.colors.toastSuccess};}
     .foxy-toast.error{color:${_settings.colors.toastError};border-left:4px solid ${_settings.colors.toastError};}
     .foxy-toast .close-x { margin-left:auto; cursor:pointer; color:#ccc; padding-left:8px; }
-    .foxy-window input, .foxy-window textarea, .foxy-window select { background:${_settings.colors.inputBg}; color:${_settings.colors.text}; border:1px solid ${_settings.colors.inputBorder}; border-radius:5px; padding:6px 8px; outline:none; font-family:${_settings.font}; width:100%; box-sizing:border-box; }
+    
+    .foxy-window input, .foxy-window textarea, .foxy-window select {
+      background:${_settings.colors.inputBg};
+      color:${_settings.colors.text};
+      border:1px solid ${_settings.colors.inputBorder};
+      border-radius:5px;
+      padding:6px 8px;
+      outline:none;
+      font-family:${_settings.font};
+      width:100%;
+      box-sizing:border-box;
+      transition: border 0.2s, background 0.2s;
+    }
+    .foxy-window input:focus, .foxy-window textarea:focus, .foxy-window select:focus {
+      border-color:#7aff7a;
+    }
     .foxy-window input::placeholder, .foxy-window textarea::placeholder { color:${_settings.colors.placeholder}; }
-    .foxy-window button { background:${_settings.colors.buttonBg}; color:${_settings.colors.buttonText}; border:1px solid #444; border-radius:6px; padding:6px 12px; cursor:pointer; transition: all 0.2s; font-family:${_settings.font}; }
+    
+    .foxy-window button {
+      background:${_settings.colors.buttonBg};
+      color:${_settings.colors.buttonText};
+      border:1px solid #444;
+      border-radius:6px;
+      padding:6px 12px;
+      cursor:pointer;
+      transition: all 0.2s;
+      font-family:${_settings.font};
+    }
     .foxy-window button:hover { background:${_settings.colors.buttonHover}; }
   `;
   document.head.appendChild(style);
@@ -86,9 +219,7 @@
       if(other===win) continue;
       if(distance(win.el, other.el)<mergeThreshold){
         const oldTabs = [...win.tabs];
-        oldTabs.forEach(tab=>{
-          other.addTab({name:tab.name, html:tab.html, icon:tab.el.querySelector("img")?.src});
-        });
+        oldTabs.forEach(tab=>{ other.addTab({name:tab.name, html:tab.html, icon:tab.el.querySelector("img")?.src}); });
         _mergeHistory.push({from:win, to:other, tabs:oldTabs});
         win.el.remove();
         delete _windows[win.id];
@@ -98,21 +229,18 @@
     }
     return win;
   }
-  function undoMerge(){
-    if(_mergeHistory.length===0){ showToast("No merge to undo",{type:"error"}); return; }
+  function undoMerge(){ if(_mergeHistory.length===0){ showToast("No merge to undo",{type:"error"}); return; }
     const last = _mergeHistory.pop();
-    const {from,to,tabs} = last;
+    const {from,tabs} = last;
     const newWin = FoxyUI.createWindow({title:from.el.querySelector(".foxy-title").textContent});
     tabs.forEach(tab=>newWin.addTab({name:tab.name, html:tab.html, icon:tab.el.querySelector("img")?.src}));
     showToast(`Merge undone for "${newWin.el.querySelector(".foxy-title").textContent}"`,{type:"success"});
   }
-
   addKeybind("ctrl+z", undoMerge);
 
   // ---------- WINDOW CREATION ----------
   const oldCreateWindow = function(options={}) {
     const {title="Foxy Window", width=520, height=420, icon=null, resizable=true, movable=true, minimizable=true, sidebarMode=false, defaultTab=0, onClose, onOpen} = options;
-
     const el=document.createElement("div"); el.className="foxy-window";
     el.style.width=width+"px"; el.style.height=height+"px"; el.style.left="100px"; el.style.top="100px";
     el.innerHTML=`
@@ -141,10 +269,8 @@
         if(icon){ const img=document.createElement("img"); img.src=icon; tab.appendChild(img); }
         const span=document.createElement("span"); span.textContent=name; tab.appendChild(span);
         this.tabbar.appendChild(tab);
-
         const tabObj = {el:tab,name,html};
         tabs.push(tabObj);
-
         const activate = ()=>{
           this.tabbar.querySelectorAll(".foxy-tab").forEach(t=>t.classList.remove("active"));
           tab.classList.add("active");
@@ -160,19 +286,10 @@
       removeTab(tabObj){ const idx=tabs.indexOf(tabObj); if(idx>-1){ tabObj.el.remove(); tabs.splice(idx,1); if(tabs.length>0) tabs[0].el.click(); emit("tabRemoved", winAPI, tabObj); } },
       editTab(tabObj, {name, html, icon}){ if(name) tabObj.name=name; if(html) tabObj.html=html; if(icon && tabObj.el.querySelector("img")) tabObj.el.querySelector("img").src=icon; if(name) tabObj.el.querySelector("span").textContent=name; if(tabObj.el.classList.contains("active") && html) this.setContent(html); emit("tabEdited", winAPI, tabObj); }
     };
-
     _windows[id] = winAPI;
 
-    el.querySelector(".close").onclick = ()=>{
-      delete _windows[id];
-      el.remove();
-      emit("windowClosed",winAPI);
-      onClose?.();
-    };
-
-    if(minimizable){
-      el.querySelector(".minimize").onclick = ()=> el.style.display = el.style.display === "none" ? "flex" : "none";
-    }
+    el.querySelector(".close").onclick = ()=>{ delete _windows[id]; el.remove(); emit("windowClosed",winAPI); onClose?.(); };
+    if(minimizable){ el.querySelector(".minimize").onclick = ()=> el.style.display = el.style.display === "none" ? "flex" : "none"; }
 
     if(movable){
       const header = el.querySelector(".foxy-header");
