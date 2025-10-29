@@ -201,4 +201,4 @@ FoxyUI v14 is **open-source** and free to use for personal and commercial projec
 
 ---
 
-> Made with 🐾 by [Your Name]
+> Made with 🐾 by [Zirmith]
