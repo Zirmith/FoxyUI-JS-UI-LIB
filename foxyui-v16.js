@@ -4,18 +4,34 @@
     return;
   }
 
-  const _windows = {}, _toasts = [], _settings = {
-    theme: "dark",
-    colors: {
-      windowBg: "#0f0f0f", text: "#baffda", header: "#222",
-      tabActive: "#222", tabInactive: "#aaa",
-      tabHover: "#333", toastInfo: "#6ec6ff", toastSuccess: "#7aff7a", toastError: "#ff7a7a",
-      inputBg: "#1a1a1a", inputBorder: "#444", buttonBg: "#333",
-      buttonHover: "#444", buttonText: "#fff", placeholder: "#888"
-    },
-    font: "monospace"
-  };
-  const _plugins = [], _events = {}, _keybinds = [], _mergeHistory = [];
+  const _windows = {},
+    _toasts = [],
+    _settings = {
+      theme: "dark",
+      colors: {
+        windowBg: "#0f0f0f",
+        text: "#baffda",
+        header: "#222",
+        tabActive: "#222",
+        tabInactive: "#aaa",
+        tabHover: "#333",
+        toastInfo: "#6ec6ff",
+        toastSuccess: "#7aff7a",
+        toastError: "#ff7a7a",
+        inputBg: "#1a1a1a",
+        inputBorder: "#444",
+        buttonBg: "#333",
+        buttonHover: "#444",
+        buttonText: "#fff",
+        placeholder: "#888",
+      },
+      font: "monospace",
+    };
+
+  const _plugins = [],
+    _events = {},
+    _keybinds = [],
+    _mergeHistory = [];
 
   // ---------- STYLE ----------
   const style = document.createElement("style");
@@ -55,36 +71,79 @@
   document.head.appendChild(style);
 
   // ---------- LIBRARIES ----------
-  const loadScript = (src, check, cb) => { if(window[check]) return cb?.(); const s=document.createElement("script"); s.src=src; s.onload=cb; document.head.appendChild(s); };
-  loadScript("https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js","THREE",()=>console.log("Three.js loaded~"));
-  loadScript("https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.0/anime.min.js","anime",()=>console.log("Anime.js loaded~"));
+  const loadScript = (src, check, cb) => {
+    if (window[check]) return cb?.();
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = cb;
+    document.head.appendChild(s);
+  };
+  loadScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js",
+    "THREE",
+    () => console.log("Three.js loaded~")
+  );
+  loadScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.0/anime.min.js",
+    "anime",
+    () => console.log("Anime.js loaded~")
+  );
 
   // ---------- TOAST ----------
-  const toastWrap = document.createElement("div"); toastWrap.className = "foxy-toast-wrap"; document.body.appendChild(toastWrap);
-  function showToast(msg,{type="info",duration=3000,persistent=false}={}) {
-    const el = document.createElement("div"); el.className = "foxy-toast " + type;
-    el.innerHTML = `<div>${msg}</div><div class="close-x">✖</div>`; toastWrap.prepend(el);
+  const toastWrap = document.createElement("div");
+  toastWrap.className = "foxy-toast-wrap";
+  document.body.appendChild(toastWrap);
+
+  function showToast(msg, { type = "info", duration = 3000, persistent = false } = {}) {
+    const el = document.createElement("div");
+    el.className = "foxy-toast " + type;
+    el.innerHTML = `<div>${msg}</div><div class="close-x">✖</div>`;
+    toastWrap.prepend(el);
     el.querySelector(".close-x").onclick = () => el.remove();
-    if(!persistent) setTimeout(()=>el.remove(),duration);
+    if (!persistent) setTimeout(() => el.remove(), duration);
   }
 
   // ---------- KEYBIND ----------
-  function addKeybind(keyCombo, callback){ _keybinds.push({keyCombo:keyCombo.toLowerCase(), callback}); }
-  document.addEventListener("keydown", e => {
-    const combo = `${e.ctrlKey?"ctrl+":""}${e.shiftKey?"shift+":""}${e.altKey?"alt+":""}${e.key.toLowerCase()}`;
-    _keybinds.forEach(kb => { if(kb.keyCombo === combo){ kb.callback(); e.preventDefault(); } });
+  function addKeybind(keyCombo, callback) {
+    _keybinds.push({ keyCombo: keyCombo.toLowerCase(), callback });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const combo = `${e.ctrlKey ? "ctrl+" : ""}${e.shiftKey ? "shift+" : ""}${e.altKey ? "alt+" : ""}${e.key.toLowerCase()}`;
+    _keybinds.forEach((kb) => {
+      if (kb.keyCombo === combo) {
+        kb.callback();
+        e.preventDefault();
+      }
+    });
   });
 
   // ---------- WINDOW CREATION ----------
-  function createWindow(options={}) {
-    const {title="Foxy Window", width=520, height=420, icon=null, resizable=true, movable=true, minimizable=true, defaultTab=0, onClose, onOpen} = options;
-    const el=document.createElement("div"); el.className="foxy-window";
-    el.style.width=width+"px"; el.style.height=height+"px"; el.style.left="100px"; el.style.top="100px";
-    el.innerHTML=`
+  function createWindow(options = {}) {
+    const {
+      title = "Foxy Window",
+      width = 520,
+      height = 420,
+      icon = null,
+      resizable = true,
+      movable = true,
+      minimizable = true,
+      defaultTab = 0,
+      onClose,
+      onOpen,
+    } = options;
+
+    const el = document.createElement("div");
+    el.className = "foxy-window";
+    el.style.width = width + "px";
+    el.style.height = height + "px";
+    el.style.left = "100px";
+    el.style.top = "100px";
+    el.innerHTML = `
       <div class="foxy-header">
-        ${icon?`<img src="${icon}" style="width:20px;height:20px;margin-right:6px;vertical-align:middle;">`:''}
+        ${icon ? `<img src="${icon}" style="width:20px;height:20px;margin-right:6px;vertical-align:middle;">` : ""}
         <div class="foxy-title">${title}</div>
-        <div class="foxy-controls">${minimizable?'<span class="minimize">—</span>':''}<span class="close">✖</span></div>
+        <div class="foxy-controls">${minimizable ? '<span class="minimize">—</span>' : ""}<span class="close">✖</span></div>
       </div>
       <div class="foxy-tabbar"></div>
       <div class="foxy-content"></div>
@@ -92,79 +151,146 @@
     `;
     document.body.appendChild(el);
 
-    const id="win_"+Date.now(), tabs=[];
+    const id = "win_" + Date.now();
+    const tabs = [];
+
     const winAPI = {
-      id, el, tabs, tabbar:el.querySelector(".foxy-tabbar"), content:el.querySelector(".foxy-content"), footer:el.querySelector(".foxy-footer"),
-      setContent(html){ this.content.innerHTML=html; },
-      addButton(label,fn){ const b=document.createElement("button"); b.textContent=label; b.onclick=fn; this.footer.appendChild(b); return b; },
-      addTab({name, html, iconClass=null}) {
-  const tab = document.createElement("div"); 
-  tab.className = "foxy-tab";
-
-  // ✅ Use <i> for Remix Icon fonts
-  if(iconClass){
-    const i = document.createElement("i");
-    i.className = iconClass; // e.g., "ri-home-5-line"
-    i.style.fontSize = "16px";
-    i.style.verticalAlign = "middle";
-    tab.appendChild(i);
-  }
-
-  const span = document.createElement("span"); 
-  span.textContent = name; 
-  tab.appendChild(span);
-
-  this.tabbar.appendChild(tab);
-  const tabObj = {el: tab, name, html}; 
-  tabs.push(tabObj);
-
-  const activate = () => {
-    this.tabbar.querySelectorAll(".foxy-tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    this.setContent(html);
-  };
-
-  tab.onclick = activate; 
-  if(tabs.length-1 === defaultTab) tab.click(); 
-  return tabObj;
-}
-
+      id,
+      el,
+      tabs,
+      tabbar: el.querySelector(".foxy-tabbar"),
+      content: el.querySelector(".foxy-content"),
+      footer: el.querySelector(".foxy-footer"),
+      setContent(html) {
+        this.content.innerHTML = html;
       },
-      // ---------- ENGINE FEATURES ----------
-      animate(targets,props){ if(window.anime) return anime({...props, targets}); else showToast("Anime.js not loaded",{type:"error"}); },
-      createThreeScene(containerEl=this.content){
-        if(!window.THREE){ showToast("Three.js not loaded",{type:"error"}); return; }
-        const scene=new THREE.Scene();
-        const camera=new THREE.PerspectiveCamera(75, containerEl.clientWidth/containerEl.clientHeight, 0.1, 1000);
-        const renderer=new THREE.WebGLRenderer({antialias:true});
+      addButton(label, fn) {
+        const b = document.createElement("button");
+        b.textContent = label;
+        b.onclick = fn;
+        this.footer.appendChild(b);
+        return b;
+      },
+      addTab({ name, html, iconClass = null }) {
+        const tab = document.createElement("div");
+        tab.className = "foxy-tab";
+
+        if (iconClass) {
+          const i = document.createElement("i");
+          i.className = iconClass;
+          i.style.fontSize = "16px";
+          i.style.verticalAlign = "middle";
+          tab.appendChild(i);
+        }
+
+        const span = document.createElement("span");
+        span.textContent = name;
+        tab.appendChild(span);
+
+        this.tabbar.appendChild(tab);
+        const tabObj = { el: tab, name, html };
+        tabs.push(tabObj);
+
+        const activate = () => {
+          this.tabbar.querySelectorAll(".foxy-tab").forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          this.setContent(html);
+        };
+
+        tab.onclick = activate;
+        if (tabs.length - 1 === defaultTab) tab.click();
+        return tabObj;
+      },
+      animate(targets, props) {
+        if (window.anime) return anime({ ...props, targets });
+        else showToast("Anime.js not loaded", { type: "error" });
+      },
+      createThreeScene(containerEl = this.content) {
+        if (!window.THREE) {
+          showToast("Three.js not loaded", { type: "error" });
+          return;
+        }
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          containerEl.clientWidth / containerEl.clientHeight,
+          0.1,
+          1000
+        );
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(containerEl.clientWidth, containerEl.clientHeight);
-        containerEl.innerHTML=""; containerEl.appendChild(renderer.domElement);
-        camera.position.z=5;
-        function animateThree(){ requestAnimationFrame(animateThree); renderer.render(scene,camera); }
+        containerEl.innerHTML = "";
+        containerEl.appendChild(renderer.domElement);
+        camera.position.z = 5;
+        function animateThree() {
+          requestAnimationFrame(animateThree);
+          renderer.render(scene, camera);
+        }
         animateThree();
-        return {scene,camera,renderer};
+        return { scene, camera, renderer };
       },
-      addIcon(iconClass,label,callback){ const i=document.createElement("i"); i.className=iconClass; i.style.cursor="pointer"; if(label) i.title=label; i.onclick=callback; this.content.appendChild(i); return i; }
+      addIcon(iconClass, label, callback) {
+        const i = document.createElement("i");
+        i.className = iconClass;
+        i.style.cursor = "pointer";
+        if (label) i.title = label;
+        i.onclick = callback;
+        this.content.appendChild(i);
+        return i;
+      },
     };
-    _windows[id]=winAPI;
-    el.querySelector(".close").onclick=()=>{ delete _windows[id]; el.remove(); onClose?.(); };
-    if(minimizable) el.querySelector(".minimize").onclick=()=> el.style.display=el.style.display==="none"?"flex":"none";
 
-    // Drag
-    if(movable){
-      const header=el.querySelector(".foxy-header"); let offsetX=0,offsetY=0,dragging=false;
-      header.addEventListener("mousedown",e=>{ dragging=true; offsetX=e.clientX-el.offsetLeft; offsetY=e.clientY-el.offsetTop; header.style.cursor="grabbing"; });
-      document.addEventListener("mouseup",()=>dragging=false);
-      document.addEventListener("mousemove",e=>{ if(dragging){ el.style.left=(e.clientX-offsetX)+"px"; el.style.top=(e.clientY-offsetY)+"px"; } });
+    _windows[id] = winAPI;
+
+    el.querySelector(".close").onclick = () => {
+      delete _windows[id];
+      el.remove();
+      onClose?.();
+    };
+
+    if (minimizable)
+      el.querySelector(".minimize").onclick = () =>
+        (el.style.display = el.style.display === "none" ? "flex" : "none");
+
+    if (movable) {
+      const header = el.querySelector(".foxy-header");
+      let offsetX = 0,
+        offsetY = 0,
+        dragging = false;
+      header.addEventListener("mousedown", (e) => {
+        dragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        header.style.cursor = "grabbing";
+      });
+      document.addEventListener("mouseup", () => (dragging = false));
+      document.addEventListener("mousemove", (e) => {
+        if (dragging) {
+          el.style.left = e.clientX - offsetX + "px";
+          el.style.top = e.clientY - offsetY + "px";
+        }
+      });
     }
+
+    onOpen?.();
     return winAPI;
   }
 
   // ---------- EXPORT ----------
   window.FoxyUI = {
-    _version:16, _windows, _toasts, _settings, _plugins, _keybinds,
-    showToast, createWindow, addKeybind
+    _version: 16,
+    _windows,
+    _toasts,
+    _settings,
+    _plugins,
+    _keybinds,
+    showToast,
+    createWindow,
+    addKeybind,
   };
 
-  console.log("%c🐾 FoxyUI v16 loaded~ Engine-style, ImGui vibes, Anime.js & Three.js built-in", "color:#aef;font-weight:700");
+  console.log(
+    "%c🐾 FoxyUI v16 loaded~ Engine-style, ImGui vibes, Anime.js & Three.js built-in",
+    "color:#aef;font-weight:700"
+  );
 })();
