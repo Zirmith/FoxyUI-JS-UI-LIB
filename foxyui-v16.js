@@ -1,3 +1,17 @@
+// ==========================
+// 🦊 FoxyUI v16 with Updater
+// ==========================
+
+// --- Auto-load cached latest version ---
+(() => {
+  const cached = localStorage.getItem("FoxyUI_latest");
+  if (cached) {
+    console.log("%c🐾 Loaded cached FoxyUI update~", "color:#7af;font-weight:700");
+    eval(cached);
+    return;
+  }
+})();
+
 (() => {
   if (window.FoxyUI && window.FoxyUI._version >= 16) {
     console.warn("FoxyUI v16 already loaded~");
@@ -98,46 +112,21 @@
       setContent(html){ this.content.innerHTML=html; },
       addButton(label,fn){ const b=document.createElement("button"); b.textContent=label; b.onclick=fn; this.footer.appendChild(b); return b; },
       addTab({name, html, iconClass=null}) {
-  const tab = document.createElement("div"); 
-  tab.className = "foxy-tab";
-
-  // ✅ Use <i> for Remix Icon fonts
-  if(iconClass){
-    const i = document.createElement("i");
-    i.className = iconClass; // e.g., "ri-home-5-line"
-    i.style.fontSize = "16px";
-    i.style.verticalAlign = "middle";
-    tab.appendChild(i);
-  }
-
-  const span = document.createElement("span"); 
-  span.textContent = name; 
-  tab.appendChild(span);
-
-  this.tabbar.appendChild(tab);
-  const tabObj = {el: tab, name, html}; 
-  tabs.push(tabObj);
-
-  const activate = () => {
-    this.tabbar.querySelectorAll(".foxy-tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    this.setContent(html);
-  };
-
-  tab.onclick = activate; 
-  if(tabs.length-1 === defaultTab) tab.click(); 
-  return tabObj;
-}
-
+        const tab=document.createElement("div"); tab.className="foxy-tab";
+        if(iconClass){ const i=document.createElement("i"); i.className=iconClass; i.style.fontSize="16px"; i.style.verticalAlign="middle"; tab.appendChild(i); }
+        const span=document.createElement("span"); span.textContent=name; tab.appendChild(span);
+        this.tabbar.appendChild(tab);
+        const tabObj={el:tab,name,html}; tabs.push(tabObj);
+        const activate=()=>{ this.tabbar.querySelectorAll(".foxy-tab").forEach(t=>t.classList.remove("active")); tab.classList.add("active"); this.setContent(html); };
+        tab.onclick=activate; if(tabs.length-1===defaultTab) tab.click(); return tabObj;
       },
-      // ---------- ENGINE FEATURES ----------
-      animate(targets,props){ if(window.anime) return anime({...props, targets}); else showToast("Anime.js not loaded",{type:"error"}); },
+      animate(targets,props){ if(window.anime) return anime({...props,targets}); else showToast("Anime.js not loaded",{type:"error"}); },
       createThreeScene(containerEl=this.content){
         if(!window.THREE){ showToast("Three.js not loaded",{type:"error"}); return; }
         const scene=new THREE.Scene();
-        const camera=new THREE.PerspectiveCamera(75, containerEl.clientWidth/containerEl.clientHeight, 0.1, 1000);
+        const camera=new THREE.PerspectiveCamera(75,containerEl.clientWidth/containerEl.clientHeight,0.1,1000);
         const renderer=new THREE.WebGLRenderer({antialias:true});
-        renderer.setSize(containerEl.clientWidth, containerEl.clientHeight);
+        renderer.setSize(containerEl.clientWidth,containerEl.clientHeight);
         containerEl.innerHTML=""; containerEl.appendChild(renderer.domElement);
         camera.position.z=5;
         function animateThree(){ requestAnimationFrame(animateThree); renderer.render(scene,camera); }
@@ -160,11 +149,40 @@
     return winAPI;
   }
 
-  // ---------- EXPORT ----------
-  window.FoxyUI = {
-    _version:16, _windows, _toasts, _settings, _plugins, _keybinds,
-    showToast, createWindow, addKeybind
-  };
+  // ---------- AUTO UPDATER ----------
+  function checkForUpdates(updaterUrl){
+    showToast("Checking for updates...",{type:"info"});
+    fetch(updaterUrl)
+      .then(r=>r.text())
+      .then(js=>{
+        try{
+          eval(js);
+          const meta=window.FoxyUI_UpdateMeta;
+          if(!meta) throw new Error("No update metadata found");
+          const current=window.FoxyUI._version, latest=meta.version;
+          if(latest>current){
+            showToast(`Update found! v${latest} available (current: v${current})`,{type:"success",persistent:true});
+            console.log(`🐾 FoxyUI update available → v${latest}\nChangelog:`,meta.changelog.join("\n"));
+            if(confirm(`FoxyUI v${latest} is available!\n\nChanges:\n${meta.changelog.join("\n")}\n\nUpdate now?`)){
+              fetch(meta.updateURL)
+                .then(r=>r.text())
+                .then(code=>{
+                  localStorage.setItem("FoxyUI_latest",code);
+                  showToast("Updating FoxyUI... please wait",{type:"info"});
+                  setTimeout(()=>{ eval(code); showToast("FoxyUI updated successfully~",{type:"success"}); },1500);
+                });
+            }
+          } else showToast("FoxyUI is up to date~",{type:"success"});
+        }catch(err){ console.error("Updater error:",err); showToast("Failed to check updates",{type:"error"}); }
+      })
+      .catch(err=>{ console.error("Fetch error:",err); showToast("Could not fetch updater.js",{type:"error"}); });
+  }
 
-  console.log("%c🐾 FoxyUI v16 loaded~ Engine-style, ImGui vibes, Anime.js & Three.js built-in", "color:#aef;font-weight:700");
+  // ---------- EXPORT ----------
+  window.FoxyUI={ _version:16,_windows,_toasts,_settings,_plugins,_keybinds,showToast,createWindow,addKeybind,checkForUpdates };
+
+  console.log("%c🐾 FoxyUI v16 loaded~ Engine-style, ImGui vibes, Anime.js & Three.js built-in","color:#aef;font-weight:700");
+
+  // ✅ Auto-check for updates
+  checkForUpdates("https://raw.githubusercontent.com/Zirmith/FoxyUI-JS-UI-LIB/refs/heads/main/updater.js");
 })();
