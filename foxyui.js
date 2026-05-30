@@ -146,7 +146,8 @@
     radius: "8px",
     blur: "20px",
     sidebarWidth: "220px",
-    bgImage: null
+    bgImage: null,
+    autoCheckUpdates: true // Automatic background update checking toggler
   };
   const _plugins = [];
   const _events = {};
@@ -955,6 +956,99 @@
     }
   }
 
+  // ---------- SYSTEM UPDATE CHECKER ----------
+  async function checkForUpdates(silent = false) {
+    const updateMetaURL = "https://raw.githubusercontent.com/Zirmith/FoxyUI-JS-UI-LIB/refs/heads/main/updater.js";
+    const fallbackLibURL = "https://raw.githubusercontent.com/Zirmith/FoxyUI-JS-UI-LIB/refs/heads/main/foxyui.js";
+
+    try {
+      const response = await fetch(updateMetaURL, { cache: "no-cache" });
+      if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+      const text = await response.text();
+
+      // Extract raw remote version matches
+      let remoteVersion = null;
+      const metaMatch = text.match(/version:\s*([0-9.]+)/i);
+      const libMatch = text.match(/_version:\s*([0-9.]+)/i);
+      const commentMatch = text.match(/FoxyUI\s+v([0-9.]+)/i);
+
+      if (metaMatch) remoteVersion = parseFloat(metaMatch[1]);
+      else if (libMatch) remoteVersion = parseFloat(libMatch[1]);
+      else if (commentMatch) remoteVersion = parseFloat(commentMatch[1]);
+
+      if (!remoteVersion || isNaN(remoteVersion)) {
+        if (!silent) showToast("Could not parse remote version metrics.", { type: "error" });
+        return null;
+      }
+
+      const localVersion = window.FoxyUI ? window.FoxyUI._version : 22;
+      const updateAvailable = remoteVersion > localVersion;
+
+      // Extract remote changelog strings
+      let changelog = [];
+      const changelogMatch = text.match(/changelog:\s*\[([\s\S]*?)\]/);
+      if (changelogMatch) {
+        try {
+          changelog = changelogMatch[1]
+            .split(",")
+            .map(s => s.trim().replace(/^["']|["']$/g, ""))
+            .filter(Boolean);
+        } catch (e) {}
+      }
+
+      if (updateAvailable) {
+        if (silent) {
+          showToast(`FoxyUI v${remoteVersion} update is available! Check your settings menu.`, { 
+            type: "info", 
+            persistent: true,
+            icon: getIcon("bell", {size: 14})
+          });
+        } else {
+          showModal({
+            title: `Update Available — FoxyUI v${remoteVersion}`,
+            body: `
+              <div>
+                <p>A new release is available! (Installed: <strong>v${localVersion}</strong>, Available: <strong style="color:var(--foxy-online)">v${remoteVersion}</strong>).</p>
+                ${changelog.length > 0 ? `
+                  <div style="background:var(--foxy-surface-alt); border:1px solid var(--foxy-divider); border-radius:6px; padding:12px; margin-top:12px;">
+                    <div style="font-weight:700; font-size:12px; text-transform:uppercase; color:var(--foxy-accent); margin-bottom:6px">Changelog:</div>
+                    <ul style="margin:0; padding-left:18px; font-size:13px; color:var(--foxy-text-muted); line-height:1.5;">
+                      ${changelog.map(item => `<li>${item}</li>`).join("")}
+                    </ul>
+                  </div>
+                ` : ""}
+              </div>
+            `,
+            buttons: [
+              { label: "Dismiss", variant: "secondary" },
+              { 
+                label: "Update Now", 
+                onClick: () => {
+                  showToast("Applying live update...", { type: "info" });
+                  const script = document.createElement("script");
+                  script.src = fallbackLibURL;
+                  document.head.appendChild(script);
+                }
+              }
+            ]
+          });
+        }
+        return { available: true, version: remoteVersion, changelog };
+      } else {
+        if (!silent) {
+          showToast(`FoxyUI is currently up to date (v${localVersion}).`, { type: "success" });
+        }
+        return { available: false, version: remoteVersion };
+      }
+    } catch (err) {
+      console.error("[FoxyUI Update Check Failed]", err);
+      if (!silent) {
+        showToast("Unable to check repository for system updates.", { type: "error" });
+      }
+      return null;
+    }
+  }
+
   // ---------- CUSTOM SETTINGS API ----------
   function registerSettingsSection({ id, label, category = "USER SETTINGS", render }) {
     if (_customSettings.some(s => s.id === id)) return;
@@ -1420,6 +1514,7 @@
           { id: "appearance", label: "Appearance", category: "App Settings" },
           { id: "voice", label: "Voice & Video", category: "App Settings" },
           { id: "plugins", label: "Plugins", category: "App Settings" },
+          { id: "updates", label: "Updates", category: "App Settings" }, // Integrated section
           { id: "changelog", label: "Changelog", category: "Information" },
           { id: "about", label: "About FoxyUI", category: "Information" }
         ];
@@ -1587,6 +1682,29 @@
               </div>
             `;
           }
+          if (sectionKey === "updates") {
+            return `
+              <h2 style="margin-top:0; font-size:20px; font-weight:700">System Updates</h2>
+              <p style="color:var(--foxy-text-muted); font-size:14px">Manage automatic initialization scans and live installation settings.</p>
+              <div style="margin-top:24px; display:flex; flex-direction:column; gap:16px">
+                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--foxy-surface-alt); padding:14px 16px; border-radius:6px; border:1px solid var(--foxy-divider);">
+                  <div>
+                    <div style="font-weight:600; font-size:14px">Automatically Check for Updates</div>
+                    <div style="font-size:12px; color:var(--foxy-text-muted)">Checks the remote repository on initialization.</div>
+                  </div>
+                  <label class="foxy-switch">
+                    <input type="checkbox" id="setting-check-autoupdate" ${_settings.autoCheckUpdates ? 'checked' : ''}>
+                    <span class="foxy-switch-slider"></span>
+                  </label>
+                </div>
+                <div class="foxy-card" style="flex-direction:column; align-items:flex-start; gap:12px; background:var(--foxy-surface-alt);">
+                  <div style="font-weight:700; font-size:15px">Manual Check</div>
+                  <div style="font-size:13px; color:var(--foxy-text-muted)">Query the remote repository manually to retrieve the latest patch release.</div>
+                  <button id="setting-btn-checknow" style="margin-top:4px;">Check Now</button>
+                </div>
+              </div>
+            `;
+          }
           if (sectionKey === "changelog") {
             return `
               <h2 style="margin-top:0; font-size:20px; font-weight:700">Changelog — Version History</h2>
@@ -1685,6 +1803,9 @@
             this.setUserProfile(user);
             emit("userDeafenToggled", winAPI, user);
           }
+          if (e.target.id === "setting-check-autoupdate") {
+            _settings.autoCheckUpdates = e.target.checked;
+          }
           if (e.target.classList.contains("setting-plugin-toggle")) {
             const idx = parseInt(e.target.dataset.idx);
             const p = _plugins[idx];
@@ -1704,6 +1825,15 @@
               this.setUserProfile(user);
               showToast("Account saved!", { type: "success" });
             }
+          }
+          if (e.target.id === "setting-btn-checknow") {
+            const btn = e.target;
+            btn.disabled = true;
+            btn.textContent = "Checking...";
+            checkForUpdates(false).finally(() => {
+              btn.disabled = false;
+              btn.textContent = "Check Now";
+            });
           }
         });
 
@@ -1851,6 +1981,7 @@
   }
 
   // ---------- DEFAULT COMMANDS ----------
+  registerCommand({ id: "system.update", label: "Check for Updates", category: "System", onRun: () => checkForUpdates(false) });
   registerCommand({ id: "theme.dark", label: "Theme: Dark", category: "Appearance", onRun: () => setTheme("dark") });
   registerCommand({ id: "theme.light", label: "Theme: Light", category: "Appearance", onRun: () => setTheme("light") });
   registerCommand({ id: "theme.animated_dark", label: "Theme: Animated Dark", category: "Appearance", onRun: () => setTheme("animated_dark") });
@@ -1871,6 +2002,8 @@
     getIcon,
     // notify pipeline
     notify,
+    // updates
+    checkForUpdates,
     // windows
     createWindow,
     // toast
@@ -1894,5 +2027,14 @@
     // merging
     undoMerge
   };
+  
   console.log("%c🦊 FoxyUI v22 loaded — Animated backgrounds & reactive metrics initialized", "color:#5865f2;font-weight:700;font-size:13px");
+
+  // ---------- INITIALIZATION ACTIONS ----------
+  // Background asynchronous verification of the repository update status on initialization
+  if (_settings.autoCheckUpdates) {
+    setTimeout(() => {
+      checkForUpdates(true);
+    }, 2000);
+  }
 })();
