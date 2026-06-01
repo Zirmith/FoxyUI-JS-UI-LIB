@@ -50,9 +50,9 @@ console.log(FoxyUI.getThemes());
 
 Open these files directly in your browser:
 
-- `/tmp/workspace/Zirmith/FoxyUI-JS-UI-LIB/examples/basic/index.html` – basic window + tabs + toast usage.
-- `/tmp/workspace/Zirmith/FoxyUI-JS-UI-LIB/examples/themes/twitch.html` – Twitch-styled layout example.
-- `/tmp/workspace/Zirmith/FoxyUI-JS-UI-LIB/examples/themes/imgui.html` – ImGui-styled layout example.
+- `examples/basic/index.html` – basic window + tabs + toast usage.
+- `examples/themes/twitch.html` – Twitch-styled layout example.
+- `examples/themes/imgui.html` – ImGui-styled layout example.
 
 ## Creating your own layout/theme
 
