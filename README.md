@@ -1,204 +1,93 @@
-# 🐾 FoxyUI v14
+# 🐾 FoxyUI
 
-FoxyUI is a **lightweight, stateless, JavaScript GUI library** for building custom windows, tabs, buttons, and notifications in the browser. Perfect for **tools, extensions, overlays, debugging utilities, and web apps** without relying on frameworks or localStorage.
+FoxyUI is a stateless JavaScript UI library for draggable windows, tabs, commands, keybinds, and notifications.
 
----
-
-## 🔥 Features
-
-- **Modern, sleek interface** with dark/light themes and full customization.
-- **Windows**: draggable, resizable, minimizable, closable.
-- **Tabs**: organize content with tab headers and icons.
-- **Footer buttons**: add functional buttons easily.
-- **Toasts**: notifications with info, success, error types, auto-close or persistent.
-- **Keybinds**: bind global keyboard shortcuts.
-- **Plugin system**: extend functionality dynamically.
-- **Window merging**: merge overlapping windows and undo merges (Ctrl+Z).
-- **Event system**: handle `tabClicked`, `tabRemoved`, `windowCreated`, `windowClosed` and custom events.
-- **Stateless**: no localStorage dependencies—perfect for temporary tools or sandboxed environments.
-- **Performance-friendly**: minimal overhead, optimized for fast UIs.
-- **Cross-browser**: works in all modern browsers.
-
----
-
-## 📥 Installation
-
-Include FoxyUI in your project:
+## Installation
 
 ```html
 <script src="foxyui.js"></script>
 ```
 
-> Or inject directly in the browser console for testing.
-
----
-
-## ⚡ Quick Start
-
-### Create a Window
+## Quick start
 
 ```javascript
-const myWindow = FoxyUI.createWindow({
-  title: "My Tool",
-  width: 500,
-  height: 400,
-  icon: "icon.png",
-  resizable: true,
-  movable: true,
-  minimizable: true,
-  defaultTab: 0,
-  onOpen: () => console.log("Window opened"),
-  onClose: () => console.log("Window closed")
+const win = FoxyUI.createWindow({ title: "My Tool", width: 640, height: 420 });
+win.addTab({ name: "Home", html: "<h2>Hello from FoxyUI</h2>" });
+win.addButton("Notify", () => FoxyUI.showToast("It works!", { type: "success" }));
+```
+
+## Themes
+
+Switch at runtime:
+
+```javascript
+FoxyUI.setTheme("dark");
+FoxyUI.setTheme("twitch");
+FoxyUI.setTheme("imgui");
+```
+
+Built-in themes include:
+- `dark`
+- `light`
+- `animated_dark`
+- `animated_light`
+- `amoled`
+- `foxy`
+- `cyberpunk`
+- `synthwave`
+- `aurora`
+- `nebula`
+- `twitch`
+- `imgui`
+
+Get all available themes:
+
+```javascript
+console.log(FoxyUI.getThemes());
+```
+
+## Examples
+
+Open these files directly in your browser:
+
+- `examples/basic/index.html` – basic window + tabs + toast usage.
+- `examples/themes/twitch.html` – Twitch-styled layout example.
+- `examples/themes/imgui.html` – ImGui-styled layout example.
+
+## Creating your own layout/theme
+
+```javascript
+FoxyUI.registerTheme("my_theme", {
+  windowBg: "#101318",
+  surface: "#1a2029",
+  surfaceAlt: "#131821",
+  text: "#f1f5f9",
+  textMuted: "#94a3b8",
+  header: "#1f2937",
+  tabActive: "rgba(99, 102, 241, 0.3)",
+  tabInactive: "#94a3b8",
+  tabHover: "rgba(99, 102, 241, 0.15)",
+  inputBg: "#0f172a",
+  inputBorder: "#334155",
+  buttonBg: "#4f46e5",
+  buttonHover: "#4338ca",
+  buttonText: "#fff",
+  placeholder: "#64748b",
+  accent: "#6366f1",
+  accentHover: "#4f46e5",
+  toastInfo: "#6366f1",
+  toastSuccess: "#22c55e",
+  toastError: "#ef4444",
+  online: "#22c55e",
+  idle: "#f59e0b",
+  dnd: "#ef4444",
+  offline: "#64748b",
+  divider: "rgba(255,255,255,0.08)",
+  mention: "#ef4444"
 });
+FoxyUI.setTheme("my_theme");
 ```
 
-### Add Tabs
+## License
 
-```javascript
-myWindow.addTab({ name: "Home", html: "<h2>Welcome!</h2>", icon: "home.png" });
-myWindow.addTab({ name: "Settings", html: "<div>Settings content here</div>" });
-```
-
-### Add Footer Buttons
-
-```javascript
-myWindow.addButton("Click Me", () => alert("Button clicked!"));
-```
-
-### Show Toasts
-
-```javascript
-FoxyUI.showToast("Hello World!", { type: "success", duration: 3000 });
-FoxyUI.showToast("Error occurred!", { type: "error", persistent: true });
-```
-
-### Register Keybinds
-
-```javascript
-FoxyUI.addKeybind("ctrl+s", () => console.log("Ctrl+S pressed"));
-```
-
-### Undo Window Merge
-
-```javascript
-FoxyUI.undoMerge(); // Also bound to Ctrl+Z
-```
-
----
-
-## 🎨 Customization & Theming
-
-FoxyUI allows full control over appearance via `_settings`:
-
-```javascript
-FoxyUI._settings.colors.windowBg = "#1e1e1e";
-FoxyUI._settings.colors.text = "#ffffff";
-FoxyUI._settings.colors.header = "#333";
-FoxyUI._settings.font = "Arial, sans-serif";
-```
-
-- Modify toast colors, button colors, input backgrounds, tab colors, and placeholders.
-- Fonts are customizable globally.
-- Dynamically updating `_settings` will reflect in existing windows immediately.
-
----
-
-## 🧩 Plugin System
-
-```javascript
-FoxyUI.registerPlugin("ExamplePlugin", (FUI) => {
-  console.log("Plugin loaded~", FUI);
-});
-```
-
-Load plugins dynamically from URLs:
-
-```javascript
-FoxyUI.loadPluginFromURL("https://example.com/plugin.js");
-```
-
----
-
-## 📌 Event System
-
-```javascript
-FoxyUI.on("tabClicked", (window, tab) => console.log("Tab clicked:", tab));
-FoxyUI.on("tabRemoved", (window, tab) => console.log("Tab removed:", tab));
-FoxyUI.on("windowCreated", (window) => console.log("Window created:", window));
-FoxyUI.on("windowClosed", (window) => console.log("Window closed:", window));
-```
-
-Emit custom events:
-
-```javascript
-FoxyUI.emit("customEvent", { data: 123 });
-```
-
----
-
-## 🚀 Advanced Usage
-
-### Dynamic Tab Editing
-
-```javascript
-const tab = myWindow.addTab({ name: "Temp", html: "<p>Initial</p>" });
-myWindow.editTab(tab, { name: "Updated", html: "<p>Updated content</p>" });
-```
-
-### Remove Tabs
-
-```javascript
-myWindow.removeTab(tab);
-```
-
-### Watching Key Events Globally
-
-```javascript
-FoxyUI.addKeybind("ctrl+shift+h", () => FoxyUI.showToast("Hotkey triggered!", { type: "info" }));
-```
-
-### Combining Windows
-
-- Drag one window onto another to merge.
-- Undo merges with **Ctrl+Z**.
-
-### Toast Options
-
-```javascript
-FoxyUI.showToast("Persistent message", { type: "info", persistent: true });
-FoxyUI.showToast("Quick tip", { type: "success", duration: 1000 });
-```
-
----
-
-## 💡 Tips & Best Practices
-
-- Use **stateless mode** for temporary tools.
-- Combine with **custom game hooks** or **debug tools** (Canvas, WebGL, DOM events).
-- Use plugins to modularize features in large projects.
-- Undo merges regularly to avoid losing windows.
-- Customize colors to match your app/game theme.
-
----
-
-## 🔗 Example Project
-
-```javascript
-// Create main window
-const mainWin = FoxyUI.createWindow({ title: "Dashboard", width: 600, height: 400 });
-mainWin.addTab({ name: "Logs", html: "<div id='logs'></div>" });
-mainWin.addButton("Clear Logs", () => document.getElementById("logs").innerHTML = "");
-
-// Show notification
-FoxyUI.showToast("Welcome to Dashboard!", { type: "success" });
-```
-
----
-
-## 📦 License
-
-FoxyUI v14 is **open-source** and free to use for personal and commercial projects.
-
----
-
-> Made with 🐾 by [Zirmith]
+MIT
