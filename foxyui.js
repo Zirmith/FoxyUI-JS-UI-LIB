@@ -40,11 +40,12 @@
       } catch (_) {}
 
       if (parsedHistory) {
-        let history = parsedHistory;
-        while (history.length > 1) {
-          const keepCount = Math.max(1, Math.ceil(history.length * 0.25));
-          history = history.slice(-keepCount);
-          const serializedHistory = JSON.stringify(history);
+        const candidateSizes = [5000, 1000, 250, 50, 10, 1]
+          .map((size) => Math.min(size, parsedHistory.length))
+          .filter((size, index, list) => size > 0 && list.indexOf(size) === index);
+
+        for (const keepCount of candidateSizes) {
+          const serializedHistory = JSON.stringify(parsedHistory.slice(-keepCount));
           if (trySetItem(storage, key, serializedHistory)) return true;
         }
         return false;
@@ -61,7 +62,7 @@
         if (!isQuotaError(err) || settingName !== "consoleHistory") throw err;
         if (trimConsoleHistoryAndSave(this, settingName, settingValue)) return;
         try { this.removeItem(settingName); } catch (_) {}
-        console.warn(`[FoxyUI] Skipped saving setting '${settingName}' because storage quota was exceeded.`);
+        console.warn(`[FoxyUI] Could not save '${settingName}' because storage quota was exceeded. Console history will be lost.`);
       }
     };
   }
