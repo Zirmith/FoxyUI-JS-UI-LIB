@@ -9,10 +9,11 @@
     return;
   }
 
+  let _storageQuotaGuardInstalled = false;
   function installStorageQuotaGuard() {
     if (typeof Storage === "undefined" || !Storage.prototype) return;
-    if (Storage.prototype.__foxyQuotaGuardInstalled) return;
-    Storage.prototype.__foxyQuotaGuardInstalled = true;
+    if (_storageQuotaGuardInstalled) return;
+    _storageQuotaGuardInstalled = true;
 
     const nativeSetItem = Storage.prototype.setItem;
     const isQuotaError = (err) => !!err && (
@@ -40,9 +41,15 @@
       } catch (_) {}
 
       if (parsedHistory) {
-        const candidateSizes = [5000, 1000, 250, 50, 10, 1]
-          .map((size) => Math.min(size, parsedHistory.length))
-          .filter((size, index, list) => size > 0 && list.indexOf(size) === index);
+        const candidateSizes = [];
+        let previousSize = null;
+        for (const size of [5000, 1000, 250, 50, 10, 1]) {
+          const cappedSize = Math.min(size, parsedHistory.length);
+          if (cappedSize > 0 && cappedSize !== previousSize) {
+            candidateSizes.push(cappedSize);
+            previousSize = cappedSize;
+          }
+        }
 
         for (const keepCount of candidateSizes) {
           const serializedHistory = JSON.stringify(parsedHistory.slice(-keepCount));
@@ -57,7 +64,8 @@
       const settingName = String(key);
       const settingValue = String(value ?? "");
       try {
-        return nativeSetItem.call(this, settingName, settingValue);
+        nativeSetItem.call(this, settingName, settingValue);
+        return;
       } catch (err) {
         if (!isQuotaError(err) || settingName !== "consoleHistory") throw err;
         if (trimConsoleHistoryAndSave(this, settingName, settingValue)) return;
