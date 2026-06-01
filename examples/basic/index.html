@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoxyUI Basic Example</title>
+</head>
+<body>
+  <script src="../../foxyui.js"></script>
+  <script>
+    const win = FoxyUI.createWindow({
+      title: "FoxyUI Basic Example",
+      width: 700,
+      height: 460
+    });
+
+    win.addTab({
+      name: "Home",
+      html: "<h2>Welcome</h2><p>This is a basic FoxyUI setup.</p>"
+    });
+
+    win.addTab({
+      name: "Info",
+      html: "<p>Try opening settings or command palette (Ctrl+K).</p>"
+    });
+
+    win.addButton("Toast", () => {
+      FoxyUI.showToast("Basic example toast", { type: "success" });
+    });
+  </script>
+</body>
+</html>

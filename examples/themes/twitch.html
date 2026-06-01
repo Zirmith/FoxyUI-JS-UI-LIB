@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoxyUI Twitch Theme Example</title>
+</head>
+<body>
+  <script src="../../foxyui.js"></script>
+  <script>
+    FoxyUI.setTheme("twitch");
+
+    const win = FoxyUI.createWindow({
+      title: "Twitch Layout Demo",
+      width: 780,
+      height: 500
+    });
+
+    win.addTab({
+      name: "Stream",
+      html: "<h2>Live Channel</h2><p>Use this as a Twitch-style panel layout base.</p>"
+    });
+
+    win.addTab({
+      name: "Chat",
+      html: "<div style='display:flex;flex-direction:column;gap:8px'><p><strong>Viewer1:</strong> Pog!</p><p><strong>Viewer2:</strong> Nice UI</p></div>"
+    });
+
+    win.addButton("Follow", () => FoxyUI.showToast("Followed channel", { type: "info" }));
+  </script>
+</body>
+</html>

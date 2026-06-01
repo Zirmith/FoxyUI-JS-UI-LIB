@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoxyUI ImGui Theme Example</title>
+</head>
+<body>
+  <script src="../../foxyui.js"></script>
+  <script>
+    FoxyUI.setTheme("imgui");
+
+    const win = FoxyUI.createWindow({
+      title: "ImGui Layout Demo",
+      width: 720,
+      height: 480
+    });
+
+    win.addTab({
+      name: "Inspector",
+      html: "<h3>Component Inspector</h3><p>ImGui-like neutral tones for tooling workflows.</p>"
+    });
+
+    win.addTab({
+      name: "Console",
+      html: "<pre>[Info] Boot complete\n[Warn] Demo log message\n[Ok] Ready.</pre>"
+    });
+
+    win.addButton("Run", () => FoxyUI.showToast("Action executed", { type: "success" }));
+  </script>
+</body>
+</html>

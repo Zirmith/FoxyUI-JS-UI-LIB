@@ -135,6 +135,29 @@
       toastInfo: "#6f42c1", toastSuccess: "#28a745", toastError: "#dc3545",
       online: "#28a745", idle: "#ffc107", dnd: "#dc3545", offline: "#4c425e",
       divider: "rgba(111, 66, 193, 0.2)", mention: "#dc3545"
+    },
+    twitch: {
+      windowBg: "linear-gradient(180deg, #18181b, #0e0e10)",
+      surface: "rgba(31, 31, 35, 0.95)", surfaceAlt: "rgba(24, 24, 27, 0.95)",
+      text: "#efeff1", textMuted: "#adadb8", header: "rgba(38, 38, 44, 0.97)",
+      tabActive: "rgba(145, 71, 255, 0.28)", tabInactive: "#adadb8", tabHover: "rgba(145, 71, 255, 0.15)",
+      inputBg: "#18181b", inputBorder: "#3a3a3d", buttonBg: "#9147ff",
+      buttonHover: "#772ce8", buttonText: "#ffffff", placeholder: "#8d8d96",
+      accent: "#9147ff", accentHover: "#772ce8",
+      toastInfo: "#9147ff", toastSuccess: "#00db84", toastError: "#eb0400",
+      online: "#00db84", idle: "#f0c000", dnd: "#eb0400", offline: "#8d8d96",
+      divider: "rgba(255, 255, 255, 0.08)", mention: "#9147ff"
+    },
+    imgui: {
+      windowBg: "rgba(30, 30, 30, 0.98)", surface: "rgba(45, 45, 45, 0.98)", surfaceAlt: "rgba(36, 36, 36, 0.98)",
+      text: "#ffffff", textMuted: "#bdbdbd", header: "rgba(55, 55, 55, 0.98)",
+      tabActive: "rgba(66, 150, 250, 0.35)", tabInactive: "#bdbdbd", tabHover: "rgba(66, 150, 250, 0.18)",
+      inputBg: "#2a2a2a", inputBorder: "#5a5a5a", buttonBg: "#3f3f46",
+      buttonHover: "#4f4f58", buttonText: "#ffffff", placeholder: "#9a9a9a",
+      accent: "#4296fa", accentHover: "#2f7fd8",
+      toastInfo: "#4296fa", toastSuccess: "#5ec05e", toastError: "#ff5f5f",
+      online: "#5ec05e", idle: "#f0c04f", dnd: "#ff5f5f", offline: "#7f7f7f",
+      divider: "rgba(255, 255, 255, 0.1)", mention: "#ff8a3d"
     }
   };
 
@@ -2070,6 +2093,8 @@
   registerCommand({ id: "theme.synthwave", label: "Theme: Synthwave (Animated)", category: "Appearance", onRun: () => setTheme("synthwave") });
   registerCommand({ id: "theme.aurora", label: "Theme: Aurora (Animated)", category: "Appearance", onRun: () => setTheme("aurora") });
   registerCommand({ id: "theme.nebula", label: "Theme: Nebula (Animated)", category: "Appearance", onRun: () => setTheme("nebula") });
+  registerCommand({ id: "theme.twitch", label: "Theme: Twitch", category: "Appearance", onRun: () => setTheme("twitch") });
+  registerCommand({ id: "theme.imgui", label: "Theme: ImGui", category: "Appearance", onRun: () => setTheme("imgui") });
   registerCommand({ id: "toast.demo", label: "Show demo toast", category: "Utility", onRun: () => showToast("Hello from FoxyUI v23", { type: "success" }) });
 
   // ---------- EXPORT ----------
