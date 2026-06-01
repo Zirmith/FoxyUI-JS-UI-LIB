@@ -9,6 +9,58 @@
     return;
   }
 
+  function installStorageQuotaGuard() {
+    if (typeof Storage === "undefined" || !Storage.prototype) return;
+    if (Storage.prototype.__foxyQuotaGuardInstalled) return;
+    Storage.prototype.__foxyQuotaGuardInstalled = true;
+
+    const nativeSetItem = Storage.prototype.setItem;
+    const isQuotaError = (err) => !!err && (
+      err.name === "QuotaExceededError" ||
+      err.code === 22 ||
+      err.code === 1014 ||
+      /quota|exceeded/i.test(String(err.message || ""))
+    );
+
+    const trySetItem = (storage, key, value) => {
+      nativeSetItem.call(storage, key, value);
+      return true;
+    };
+
+    const trimConsoleHistoryAndSave = (storage, key, value) => {
+      try {
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed) || parsed.length === 0) return false;
+        let history = parsed;
+        while (history.length > 1) {
+          history = history.slice(Math.ceil(history.length / 2));
+          if (trySetItem(storage, key, JSON.stringify(history))) return true;
+        }
+      } catch (_) {}
+
+      let fallback = String(value || "");
+      while (fallback.length > 128) {
+        fallback = fallback.slice(Math.floor(fallback.length / 2));
+        if (trySetItem(storage, key, fallback)) return true;
+      }
+      return false;
+    };
+
+    Storage.prototype.setItem = function(key, value) {
+      const settingName = String(key);
+      const settingValue = String(value ?? "");
+      try {
+        return nativeSetItem.call(this, settingName, settingValue);
+      } catch (err) {
+        if (!isQuotaError(err) || settingName !== "consoleHistory") throw err;
+        if (trimConsoleHistoryAndSave(this, settingName, settingValue)) return;
+        try { this.removeItem(settingName); } catch (_) {}
+        console.warn(`[FoxyUI] Skipped saving setting '${settingName}' because storage quota was exceeded.`);
+      }
+    };
+  }
+  installStorageQuotaGuard();
+
   // ---------- THEME PRESETS ----------
   const THEMES = {
     dark: {
