@@ -23,20 +23,31 @@
     );
 
     const trySetItem = (storage, key, value) => {
-      nativeSetItem.call(storage, key, value);
-      return true;
+      try {
+        nativeSetItem.call(storage, key, value);
+        return true;
+      } catch (err) {
+        if (!isQuotaError(err)) throw err;
+        return false;
+      }
     };
 
     const trimConsoleHistoryAndSave = (storage, key, value) => {
+      let parsedHistory = null;
       try {
         const parsed = JSON.parse(value);
-        if (!Array.isArray(parsed) || parsed.length === 0) return false;
-        let history = parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) parsedHistory = parsed;
+      } catch (_) {}
+
+      if (parsedHistory) {
+        let history = parsedHistory;
         while (history.length > 1) {
           history = history.slice(Math.ceil(history.length / 2));
-          if (trySetItem(storage, key, JSON.stringify(history))) return true;
+          const serializedHistory = JSON.stringify(history);
+          if (trySetItem(storage, key, serializedHistory)) return true;
         }
-      } catch (_) {}
+        return false;
+      }
 
       let fallback = String(value || "");
       while (fallback.length > 128) {
