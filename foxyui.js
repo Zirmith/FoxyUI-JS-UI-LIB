@@ -42,17 +42,12 @@
       if (parsedHistory) {
         let history = parsedHistory;
         while (history.length > 1) {
-          history = history.slice(Math.ceil(history.length / 2));
+          const keepCount = Math.max(1, Math.ceil(history.length * 0.25));
+          history = history.slice(-keepCount);
           const serializedHistory = JSON.stringify(history);
           if (trySetItem(storage, key, serializedHistory)) return true;
         }
         return false;
-      }
-
-      let fallback = String(value || "");
-      while (fallback.length > 128) {
-        fallback = fallback.slice(Math.floor(fallback.length / 2));
-        if (trySetItem(storage, key, fallback)) return true;
       }
       return false;
     };
