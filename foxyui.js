@@ -1,11 +1,11 @@
-/* FoxyUI v22 — Discord-flavored stateless UI library
+/* FoxyUI v23 — Discord-flavored stateless UI library
  * Adds: Premium Animated Light and Animated Dark themes, fluid CSS gradient transition matrices,
  * customizable backdrop metrics, collapsible category sidebar accordions, non-blocking absolute tooltips, 
  * categorized command palettes, and extensible Settings API wrappers.
  */
 (() => {
-  if (window.FoxyUI && window.FoxyUI._version >= 22) {
-    console.warn("FoxyUI v22 already loaded~");
+  if (window.FoxyUI && window.FoxyUI._version >= 23) {
+    console.warn("FoxyUI v23 already loaded~");
     return;
   }
 
@@ -177,6 +177,16 @@
     send: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`,
     pin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-.44-1.24l-2.78-3.58A2 2 0 0 1 15 9.18V5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4.18a2 2 0 0 1-.78 1.24l-2.78 3.58a2 2 0 0 0-.44 1.24z"></path></svg>`,
     power: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>`,
+    home: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.2 3 10.4v9.4h6.6v-6h4.8v6H21v-9.4z"></path></svg>`,
+    discord: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.9a16.7 16.7 0 0 0-4.2-1.3l-.2.3c-.1.3-.3.7-.4 1a15.3 15.3 0 0 0-7 0l-.4-1-.1-.3a16.6 16.6 0 0 0-4.2 1.3A17.6 17.6 0 0 0 2 16.7a16.8 16.8 0 0 0 5.1 2.5l.4-.7.5-.9a10.8 10.8 0 0 1-1.7-.8l.4-.3a12 12 0 0 0 10.6 0l.4.3a10.8 10.8 0 0 1-1.7.8l.5.9.4.7a16.7 16.7 0 0 0 5.1-2.5 17.6 17.6 0 0 0-1.7-11.8ZM9.6 14.3c-1 0-1.8-1-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm4.8 0c-1 0-1.8-1-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"></path></svg>`,
+    user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg>`,
+    palette: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3C7 3 3 6.9 3 11.7c0 2.7 1.9 4.8 4.2 4.8h1.1c1 0 1.8.8 1.8 1.8v.7c0 1.1.9 2 2 2 4.9 0 9-4 9-8.9C21 7 17 3 12 3Z"></path><circle cx="7.5" cy="10" r="1"></circle><circle cx="11" cy="7.5" r="1"></circle><circle cx="15.5" cy="8.5" r="1"></circle><circle cx="17" cy="12.5" r="1"></circle></svg>`,
+    monitor: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="4" width="19" height="13" rx="2"></rect><path d="M8 20h8M12 17v3"></path></svg>`,
+    sparkles: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 1.9 4.8L19 8.7l-4 3.2 1.3 5.1L12 14.2 7.7 17l1.3-5.1-4-3.2 5.1-1.9z"></path></svg>`,
+    shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6v5c0 5 3.4 8.8 7 10 3.6-1.2 7-5 7-10V6z"></path></svg>`,
+    wand: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 21 8.5-8.5M14 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1zM18 11l.7 1.3 1.3.7-1.3.7L18 15l-.7-1.3-1.3-.7 1.3-.7z"></path></svg>`,
+    box: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8.5 12 3 3 8.5 12 14z"></path><path d="M3 8.5V16l9 5 9-5V8.5"></path></svg>`,
+    history: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path><path d="M12 7v5l3 2"></path></svg>`,
     chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
     chevronRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`
   };
@@ -186,8 +196,17 @@
     const temp = document.createElement("div");
     temp.innerHTML = s.trim();
     const svg = temp.firstChild;
-    svg.setAttribute("style", `width:${size}px; height:${size}px; color:${color}; fill:none; display:inline-block; vertical-align:middle;`);
+    svg.setAttribute("style", `width:${size}px; height:${size}px; color:${color}; display:inline-block; vertical-align:middle;`);
     return svg.outerHTML;
+  }
+
+  function resolveIconHTML(source, { size = 16 } = {}) {
+    if (!source || typeof source !== "string") return "";
+    const candidate = source.trim();
+    if (!candidate) return "";
+    const iconKey = candidate.startsWith("icon:") ? candidate.slice(5) : candidate;
+    if (ICONS[iconKey]) return getIcon(iconKey, { size });
+    return `<img src="${candidate}" alt="" style="width:${size}px;height:${size}px;object-fit:contain">`;
   }
 
   // ---------- STYLE ----------
@@ -272,6 +291,7 @@
         color: var(--foxy-text); font-weight:600; font-size:16px; position:relative;
         transition: border-radius .2s, background .2s; overflow:hidden;
       }
+      .foxy-server-icon svg { width: 21px; height: 21px; }
       .foxy-server-icon img { width:100%; height:100%; object-fit:cover; }
       .foxy-server-icon:hover, .foxy-server-icon.active {
         border-radius: 16px; background: var(--foxy-accent); color:#fff;
@@ -372,6 +392,8 @@
       }
       .foxy-tab:hover { background: rgba(255,255,255,0.04); color: var(--foxy-text); }
       .foxy-tab.active { background: var(--foxy-accent); color:#fff; font-weight:500; }
+      .foxy-tab .foxy-tab-icon { display:flex; align-items:center; justify-content:center; width:14px; height:14px; }
+      .foxy-tab .foxy-tab-icon svg, .foxy-tab .foxy-tab-icon img { width:14px; height:14px; object-fit:contain; }
       .foxy-tab img { width:14px; height:14px; object-fit:contain; }
 
       .foxy-content {
@@ -601,8 +623,9 @@
         font-weight: 700; margin: 12px 0 6px 6px; letter-spacing: 0.5px;
       }
       .foxy-settings-sidebar-item {
-        padding: 6px 10px; border-radius: 4px; color: var(--foxy-text-muted);
+        padding: 8px 10px; border-radius: 4px; color: var(--foxy-text-muted);
         font-size: 14px; cursor: pointer; transition: background .12s, color .12s;
+        display: flex; align-items: center; gap: 8px; font-weight: 500;
       }
       .foxy-settings-sidebar-item:hover { background: rgba(255,255,255,0.04); color: var(--foxy-text); }
       .foxy-settings-sidebar-item.active { background: rgba(255,255,255,0.08); color: var(--foxy-text); }
@@ -623,6 +646,23 @@
         font-size: 11px; font-weight: 700; color: var(--foxy-text-muted); text-transform: uppercase;
       }
       .foxy-settings-inner-content { max-width: 680px; }
+      .foxy-settings-title { margin-top: 0; margin-bottom: 4px; font-size: 20px; font-weight: 700; color: var(--foxy-text); }
+      .foxy-settings-subtitle { margin-top: 0; color: var(--foxy-text-muted); font-size: 14px; line-height: 1.45; }
+      .foxy-settings-block { margin-top: 22px; background: var(--foxy-surface); border: 1px solid var(--foxy-divider); border-radius: 8px; padding: 16px; }
+      .foxy-settings-block-title { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--foxy-text-muted); margin-bottom: 12px; }
+      .foxy-settings-field { display:flex; flex-direction:column; gap:6px; margin-bottom: 14px; }
+      .foxy-settings-field:last-child { margin-bottom: 0; }
+      .foxy-settings-label { font-size: 12px; font-weight: 700; color: var(--foxy-text-muted); text-transform: uppercase; letter-spacing: .5px; }
+      .foxy-settings-row { display:flex; align-items:center; gap: 12px; flex-wrap: wrap; }
+      .foxy-account-card { background: linear-gradient(180deg, rgba(88,101,242,0.16), rgba(88,101,242,0.06)); border: 1px solid rgba(88,101,242,0.35); border-radius: 8px; overflow: hidden; margin-bottom: 18px; }
+      .foxy-account-banner { height: 72px; background: linear-gradient(135deg, rgba(88,101,242,0.95), rgba(88,101,242,0.55)); }
+      .foxy-account-main { display:flex; gap: 16px; align-items:center; padding: 0 16px 16px; margin-top: -34px; }
+      .foxy-account-avatar { width: 78px; height: 78px; border-radius: 50%; border: 6px solid var(--foxy-surface); background: var(--foxy-accent); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size: 30px; color:#fff; font-weight:700; flex-shrink: 0; }
+      .foxy-account-avatar img { width: 100%; height: 100%; object-fit: cover; }
+      .foxy-account-meta { display:flex; flex-direction:column; gap: 2px; }
+      .foxy-account-name { font-size: 18px; font-weight: 700; color: var(--foxy-text); line-height: 1.2; }
+      .foxy-account-tag { font-size: 13px; color: var(--foxy-text-muted); font-weight: 600; }
+      .foxy-account-status { font-size: 12px; color: var(--foxy-online); font-weight: 600; margin-top: 4px; }
 
       /* Toggle Switches */
       .foxy-switch {
@@ -981,7 +1021,7 @@
         return null;
       }
 
-      const localVersion = window.FoxyUI ? window.FoxyUI._version : 22;
+      const localVersion = window.FoxyUI ? window.FoxyUI._version : 23;
       const updateAvailable = remoteVersion > localVersion;
 
       // Extract remote changelog strings
@@ -1090,7 +1130,7 @@
    * createWindow({
    *   title, width, height, icon,
    *   layout: "discord" | null,
-   *   servers:[{id, name, icon?, onClick?}],
+   *   servers:[{id, name, icon?, iconKey?, home?, onClick?}],
    *   channels:[{id, name, category?, onClick?}],
    *   members: boolean | array — whether to show member list (or pass array directly),
    *   memberList: optional explicit member array (else uses global _members)
@@ -1114,7 +1154,15 @@
 
     // Apply "discord" layout presets
     if (layout === "discord") {
-      if (finalServers === null) finalServers = [];
+      if (finalServers === null) {
+        finalServers = [
+          { id: "home", name: "Home", iconKey: "discord", home: true, active: true },
+          { divider: true },
+          { id: "friends", name: "Friends", iconKey: "user" },
+          { id: "discover", name: "Discover", iconKey: "compass" },
+          { id: "downloads", name: "Downloads", iconKey: "monitor" }
+        ];
+      }
       if (finalChannels === null) finalChannels = [];
       if (finalMembers === false) finalMembers = true;
       if (finalUser === null) {
@@ -1130,7 +1178,7 @@
 
     el.innerHTML = `
       <div class="foxy-header">
-        ${icon ? `<img src="${icon}" style="width:18px;height:18px;border-radius:4px">` : ''}
+        ${icon ? resolveIconHTML(icon, { size: 18 }) : ''}
         <div class="foxy-title">${title}</div>
         <div class="foxy-controls">
           ${layout === "discord" ? `
@@ -1184,8 +1232,13 @@
       },
       addTab({ name, html, icon = null }) {
         const tab = document.createElement("div"); tab.className = "foxy-tab";
-        if (icon) { const img = document.createElement("img"); img.src = icon; tab.appendChild(img); }
-        const span = document.createElement("span"); span.textContent = name; tab.appendChild(span);
+        if (icon) {
+          const iconWrap = document.createElement("span");
+          iconWrap.className = "foxy-tab-icon";
+          iconWrap.innerHTML = resolveIconHTML(icon, { size: 14 });
+          if (iconWrap.innerHTML.trim()) tab.appendChild(iconWrap);
+        }
+        const span = document.createElement("span"); span.className = "foxy-tab-label"; span.textContent = name; tab.appendChild(span);
         this.tabbar.appendChild(tab);
         const tabObj = { el: tab, name, html, icon };
         windowTabs.push(tabObj);
@@ -1214,9 +1267,19 @@
         emit("tabRemoved", winAPI, tabObj);
       },
       editTab(tabObj, { name, html, icon }) {
-        if (name) { tabObj.name = name; tabObj.el.querySelector("span").textContent = name; }
+        if (name) { tabObj.name = name; tabObj.el.querySelector(".foxy-tab-label").textContent = name; }
         if (html) { tabObj.html = html; if (tabObj.el.classList.contains("active")) this.setContent(html); }
-        if (icon && tabObj.el.querySelector("img")) tabObj.el.querySelector("img").src = icon;
+        if (icon !== undefined) {
+          tabObj.icon = icon;
+          const oldIcon = tabObj.el.querySelector(".foxy-tab-icon");
+          if (oldIcon) oldIcon.remove();
+          if (icon) {
+            const iconWrap = document.createElement("span");
+            iconWrap.className = "foxy-tab-icon";
+            iconWrap.innerHTML = resolveIconHTML(icon, { size: 14 });
+            if (iconWrap.innerHTML.trim()) tabObj.el.insertBefore(iconWrap, tabObj.el.firstChild);
+          }
+        }
         emit("tabEdited", winAPI, tabObj);
       },
       setServers(list) {
@@ -1227,8 +1290,14 @@
           const ic = document.createElement("div"); ic.className = "foxy-server-icon" + (s.active ? " active" : "");
           ic.title = s.name || "";
           ic.dataset.id = s.id || `s_${i}`;
-          if (s.icon) ic.innerHTML = `<img src="${s.icon}" alt="${s.name||''}">`;
-          else ic.textContent = (s.name || "?").slice(0, 2).toUpperCase();
+          if (s.iconKey || s.home || (typeof s.icon === "string" && (s.icon.startsWith("icon:") || ICONS[s.icon]))) {
+            const iconMarkup = resolveIconHTML(s.iconKey || s.icon || (s.home ? "home" : null), { size: 20 });
+            if (iconMarkup) ic.innerHTML = iconMarkup;
+          } else if (s.icon) {
+            ic.innerHTML = `<img src="${s.icon}" alt="${s.name||''}">`;
+          } else {
+            ic.textContent = (s.name || "?").slice(0, 2).toUpperCase();
+          }
           if (s.badgeCount) {
             const b = document.createElement("span");
             b.className = "foxy-badge";
@@ -1510,13 +1579,13 @@
         
         // Build settings sidebars dynamically from default sections and custom segments
         const defaultSections = [
-          { id: "my-account", label: "My Account", category: "User Settings" },
-          { id: "appearance", label: "Appearance", category: "App Settings" },
-          { id: "voice", label: "Voice & Video", category: "App Settings" },
-          { id: "plugins", label: "Plugins", category: "App Settings" },
-          { id: "updates", label: "Updates", category: "App Settings" }, // Integrated section
-          { id: "changelog", label: "Changelog", category: "Information" },
-          { id: "about", label: "About FoxyUI", category: "Information" }
+          { id: "my-account", label: "My Account", category: "User Settings", icon: "user" },
+          { id: "appearance", label: "Appearance", category: "App Settings", icon: "palette" },
+          { id: "voice", label: "Voice & Video", category: "App Settings", icon: "headset" },
+          { id: "plugins", label: "Plugins", category: "App Settings", icon: "box" },
+          { id: "updates", label: "Updates", category: "App Settings", icon: "history" }, // Integrated section
+          { id: "changelog", label: "Changelog", category: "Information", icon: "sparkles" },
+          { id: "about", label: "About FoxyUI", category: "Information", icon: "discord" }
         ];
         const allSections = [...defaultSections, ..._customSettings];
         
@@ -1530,7 +1599,7 @@
         for (const cat in groups) {
           navHTML += `<div class="foxy-settings-sidebar-header">${cat}</div>`;
           groups[cat].forEach(s => {
-            navHTML += `<div class="foxy-settings-sidebar-item" data-section="${s.id}">${s.label}</div>`;
+            navHTML += `<div class="foxy-settings-sidebar-item" data-section="${s.id}">${getIcon(s.icon || "gear", {size: 15})}<span>${s.label}</span></div>`;
           });
         }
 
@@ -1558,24 +1627,29 @@
 
           if (sectionKey === "my-account") {
             return `
-              <h2 style="margin-top:0; font-size:20px; font-weight:700">My Account</h2>
-              <div class="foxy-card">
-                <div class="foxy-avatar" style="width:80px; height:80px; font-size:32px; background:${stringToColor(user.name)}">
-                  ${user.avatar ? `<img src="${user.avatar}">` : (user.name || "?").slice(0, 1).toUpperCase()}
-                </div>
-                <div>
-                  <div style="font-size:18px; font-weight:700; color:var(--foxy-text)">${user.name}</div>
-                  <div style="font-size:14px; color:var(--foxy-text-muted)">#${user.tag || "0001"}</div>
-                  <div style="font-size:12px; color:var(--foxy-online); margin-top:4px">● Active Profile</div>
+              <h2 class="foxy-settings-title">My Account</h2>
+              <p class="foxy-settings-subtitle">Update your profile details and personalize how your identity appears across Discord-style layouts.</p>
+              <div class="foxy-account-card">
+                <div class="foxy-account-banner"></div>
+                <div class="foxy-account-main">
+                  <div class="foxy-account-avatar" style="background:${stringToColor(user.name)}">
+                    ${user.avatar ? `<img src="${user.avatar}">` : (user.name || "?").slice(0, 1).toUpperCase()}
+                  </div>
+                  <div class="foxy-account-meta">
+                    <div class="foxy-account-name">${user.name}</div>
+                    <div class="foxy-account-tag">#${user.tag || "0001"}</div>
+                    <div class="foxy-account-status">● Active Profile</div>
+                  </div>
                 </div>
               </div>
-              <div style="margin-top:24px; display:flex; flex-direction:column; gap:16px">
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">Display Name</label>
+              <div class="foxy-settings-block">
+                <div class="foxy-settings-block-title">Profile Settings</div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Display Name</label>
                   <input type="text" id="setting-input-name" value="${user.name}" style="max-width:320px">
                 </div>
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">Custom Tag</label>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Custom Tag</label>
                   <input type="text" id="setting-input-tag" value="${user.tag || "0001"}" style="max-width:320px">
                 </div>
                 <button id="setting-save-account" style="max-width:140px; margin-top:10px">Save Changes</button>
@@ -1585,38 +1659,42 @@
           if (sectionKey === "appearance") {
             const themesList = Object.keys(THEMES).map(t => `<option value="${t}" ${_settings.theme === t ? 'selected' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join("");
             return `
-              <h2 style="margin-top:0; font-size:20px; font-weight:700">Appearance</h2>
-              <p style="color:var(--foxy-text-muted); font-size:14px">Customize theme parameters, system border configurations, and animated backdrops.</p>
-              <div style="margin-top:24px; display:flex; flex-direction:column; gap:20px">
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">System Theme</label>
+              <h2 class="foxy-settings-title">Appearance</h2>
+              <p class="foxy-settings-subtitle">Tune colors and layout controls to match a modern Discord-like client experience.</p>
+              <div class="foxy-settings-block">
+                <div class="foxy-settings-block-title">Theme</div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">System Theme</label>
                   <select id="setting-select-theme" style="max-width:320px">
                     ${themesList}
                   </select>
                 </div>
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">Accent HEX Color</label>
-                  <div style="display:flex; align-items:center; gap:12px">
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Accent Color</label>
+                  <div class="foxy-settings-row">
                     <input type="color" id="setting-color-accent" value="${_settings.colors.accent}" style="width:60px; height:36px; padding:0; cursor:pointer; border:none; background:none">
                     <span style="font-family:monospace; font-size:14px">${_settings.colors.accent}</span>
                   </div>
                 </div>
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">Backdrop Blur Amount (${_settings.blur})</label>
-                  <div style="display:flex; align-items:center; gap:12px">
+              </div>
+              <div class="foxy-settings-block">
+                <div class="foxy-settings-block-title">Layout</div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Backdrop Blur (${_settings.blur})</label>
+                  <div class="foxy-settings-row">
                     <input type="range" id="setting-range-blur" min="0" max="40" value="${parseInt(_settings.blur)}" style="max-width:240px">
                     <span>${_settings.blur}</span>
                   </div>
                 </div>
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">Sidebar Width (${_settings.sidebarWidth})</label>
-                  <div style="display:flex; align-items:center; gap:12px">
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Sidebar Width (${_settings.sidebarWidth})</label>
+                  <div class="foxy-settings-row">
                     <input type="range" id="setting-range-sidebar" min="180" max="320" value="${parseInt(_settings.sidebarWidth)}" style="max-width:240px">
                     <span>${_settings.sidebarWidth}</span>
                   </div>
                 </div>
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">Window Border Radius</label>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Window Border Radius</label>
                   <select id="setting-select-radius" style="max-width:320px">
                     <option value="0px" ${_settings.radius === '0px' ? 'selected' : ''}>None (Sharp Corners)</option>
                     <option value="4px" ${_settings.radius === '4px' ? 'selected' : ''}>Subtle (4px)</option>
@@ -1624,8 +1702,8 @@
                     <option value="16px" ${_settings.radius === '16px' ? 'selected' : ''}>Ultra Rounded (16px)</option>
                   </select>
                 </div>
-                <div>
-                  <label style="font-weight:600; font-size:14px; display:block; margin-bottom:6px">Custom Background Image URL</label>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Custom Background Image URL</label>
                   <input type="text" id="setting-input-bgimg" value="${_settings.bgImage || ''}" placeholder="https://example.com/image.png" style="max-width:320px">
                 </div>
               </div>
@@ -1710,20 +1788,20 @@
               <h2 style="margin-top:0; font-size:20px; font-weight:700">Changelog — Version History</h2>
               <div style="margin-top:20px; display:flex; flex-direction:column; gap:20px">
                 <div>
-                  <div style="background:var(--foxy-accent); color:#fff; display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v22.0 Parity & Animated Themes</div>
-                  <h3 style="margin:0 0 6px 0; font-size:16px">Parity Fluid Animated Themes</h3>
-                  <p style="color:var(--foxy-text-muted); font-size:14px; margin:0 0 8px 0">Released on May 29, 2026.</p>
+                  <div style="background:var(--foxy-accent); color:#fff; display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v23.0 Discord UI Refresh</div>
+                  <h3 style="margin:0 0 6px 0; font-size:16px">Discord-style Icons & Settings Polish</h3>
+                  <p style="color:var(--foxy-text-muted); font-size:14px; margin:0 0 8px 0">Released on June 1, 2026.</p>
                   <ul style="margin:0; padding-left:20px; color:var(--foxy-text); font-size:13px; line-height:1.6">
-                    <li><strong>Animated Dark & Light Themes:</strong> Implemented fluid, shifting gradient backgrounds natively in both dark and light modes, creating smooth ambient shifting patterns.</li>
-                    <li><strong>Accordion Navigation Sidebar:</strong> Channel lists group under collapsible parent sections featuring smooth indicator arrows.</li>
-                    <li><strong>Global Hover Tooltips:</strong> Dynamic, auto-positioning tooltips on all elements containing data-tooltip variables.</li>
-                    <li><strong>Virtual Notification Routing:</strong> Messages route to unread inbox badges inside active client windows. Fallback standard toast notifications trigger only when closed.</li>
+                    <li><strong>Expanded Built-in Icons:</strong> Added Discord-oriented icon keys including home, Discord mark, user, palette, monitor, history, and more.</li>
+                    <li><strong>Server Rail Icon Support:</strong> Server and tab icons now support both image URLs and built-in icon keys via <code>icon</code>/<code>iconKey</code>.</li>
+                    <li><strong>My Account Redesign:</strong> Introduced a Discord-like account card with banner, profile avatar treatment, and grouped profile controls.</li>
+                    <li><strong>Appearance & Settings Restyle:</strong> Upgraded settings navigation and appearance controls with cleaner Discord-inspired sections and hierarchy.</li>
                   </ul>
                 </div>
                 <hr style="border:0; border-top:1px solid var(--foxy-divider); margin:10px 0">
                 <div>
-                  <div style="background:var(--foxy-surface-alt); color:var(--foxy-text-muted); display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v21.0 Archive</div>
-                  <h3 style="margin:0 0 6px 0; font-size:16px">Custom Settings Extensions & Modules</h3>
+                  <div style="background:var(--foxy-surface-alt); color:var(--foxy-text-muted); display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v22.0 Archive</div>
+                  <h3 style="margin:0 0 6px 0; font-size:16px">Parity Fluid Animated Themes</h3>
                 </div>
               </div>
             `;
@@ -1737,7 +1815,7 @@
                 <h3 style="margin-top:0; font-size:14px; font-weight:700; text-transform:uppercase; color:var(--foxy-accent)">Technical Credits</h3>
                 <p style="margin:0; font-size:13px; line-height:1.6; color:var(--foxy-text)">
                   <strong>Core Architecture:</strong> FoxyUI Developer & Open Source Contributors<br>
-                  <strong>Release Version:</strong> v22.0.0 (Stateless Engine)<br>
+                  <strong>Release Version:</strong> v23.0.0 (Stateless Engine)<br>
                   <strong>License:</strong> MIT Open Source License<br>
                   <strong>Aesthetics:</strong> Inspired by Discord design specifications
                 </p>
@@ -1992,11 +2070,11 @@
   registerCommand({ id: "theme.synthwave", label: "Theme: Synthwave (Animated)", category: "Appearance", onRun: () => setTheme("synthwave") });
   registerCommand({ id: "theme.aurora", label: "Theme: Aurora (Animated)", category: "Appearance", onRun: () => setTheme("aurora") });
   registerCommand({ id: "theme.nebula", label: "Theme: Nebula (Animated)", category: "Appearance", onRun: () => setTheme("nebula") });
-  registerCommand({ id: "toast.demo", label: "Show demo toast", category: "Utility", onRun: () => showToast("Hello from FoxyUI v22", { type: "success" }) });
+  registerCommand({ id: "toast.demo", label: "Show demo toast", category: "Utility", onRun: () => showToast("Hello from FoxyUI v23", { type: "success" }) });
 
   // ---------- EXPORT ----------
   window.FoxyUI = {
-    _version: 22,
+    _version: 23,
     _windows, _toasts, _settings, _plugins, _keybinds, _commands, _members, THEMES,
     // icons
     getIcon,
@@ -2028,7 +2106,7 @@
     undoMerge
   };
   
-  console.log("%c🦊 FoxyUI v22 loaded — Animated backgrounds & reactive metrics initialized", "color:#5865f2;font-weight:700;font-size:13px");
+  console.log("%c🦊 FoxyUI v23 loaded — Discord-style icon suite & settings refresh initialized", "color:#5865f2;font-weight:700;font-size:13px");
 
   // ---------- INITIALIZATION ACTIONS ----------
   // Background asynchronous verification of the repository update status on initialization
