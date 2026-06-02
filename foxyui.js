@@ -1,11 +1,12 @@
-/* FoxyUI v23 — Discord-flavored stateless UI library
+/* FoxyUI v25 — Discord-flavored stateless UI library
  * Adds: Premium Animated Light and Animated Dark themes, fluid CSS gradient transition matrices,
  * customizable backdrop metrics, collapsible category sidebar accordions, non-blocking absolute tooltips, 
- * categorized command palettes, and extensible Settings API wrappers.
+ * categorized command palettes, extensible Settings API wrappers, Webhook executors, 
+ * hover profile cards, live voice-activity rings, and Connected Accounts dashboard.
  */
 (() => {
-  if (window.FoxyUI && window.FoxyUI._version >= 23) {
-    console.warn("FoxyUI v23 already loaded~");
+  if (window.FoxyUI && window.FoxyUI._version >= 25) {
+    console.warn("FoxyUI v25 already loaded~");
     return;
   }
 
@@ -170,18 +171,25 @@
     blur: "20px",
     sidebarWidth: "220px",
     bgImage: null,
-    autoCheckUpdates: true // Automatic background update checking toggler
+    autoCheckUpdates: true,
+    connections: {
+      github: { connected: false, username: "" },
+      twitch: { connected: false, username: "" },
+      youtube: { connected: false, username: "" },
+      spotify: { connected: false, username: "" }
+    }
   };
   const _plugins = [];
   const _events = {};
   const _keybinds = [];
   const _mergeHistory = [];
   const _commands = [];
-  const _members = []; // {id, name, avatar, status, activity}
+  const _members = []; // {id, name, avatar, status, activity, bio, bannerColor}
   const _customSettings = [];
   const _notifications = [];
+  const _webhooks = []; // {id, name, avatar, channelId}
 
-  // ---------- VECTOR VECTOR ICON DICTIONARY ----------
+  // ---------- VECTOR ICON DICTIONARY ----------
   const ICONS = {
     hash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>`,
     volume: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`,
@@ -211,7 +219,11 @@
     box: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8.5 12 3 3 8.5 12 14z"></path><path d="M3 8.5V16l9 5 9-5V8.5"></path></svg>`,
     history: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path><path d="M12 7v5l3 2"></path></svg>`,
     chevronDown: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`,
-    chevronRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`
+    chevronRight: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`,
+    webhook: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`,
+    github: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>`,
+    twitchLogo: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>`,
+    youtube: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.508 9.388.508 9.388.508s7.517 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`
   };
 
   function getIcon(name, { size = 16, color = "currentColor" } = {}) {
@@ -391,6 +403,77 @@
         transition: opacity 0.15s; font-family: 'gg sans', sans-serif; font-weight: 500;
       }
 
+      /* Floating Discord Popout Profile Card */
+      .foxy-profile-card-popout {
+        position: fixed; width: 300px; background: #111214; border-radius: 8px;
+        border: 1px solid var(--foxy-divider); box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+        color: #dbdee1; font-family: var(--foxy-font); z-index: 10000002;
+        overflow: hidden; animation: foxy-fade-in .12s ease;
+      }
+      .foxy-profile-card-banner {
+        height: 60px; background: var(--foxy-accent); position: relative;
+      }
+      .foxy-profile-card-banner-badges {
+        position: absolute; top: 10px; right: 10px; display: flex; gap: 4px;
+      }
+      .foxy-profile-card-badge-pill {
+        background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; color: #fff;
+      }
+      .foxy-profile-card-avatar-wrap {
+        padding: 0 14px; margin-top: -32px; display: flex; justify-content: space-between; align-items: flex-end;
+      }
+      .foxy-profile-card-avatar {
+        width: 64px; height: 64px; border-radius: 50%; border: 6px solid #111214;
+        display: flex; align-items: center; justify-content: center; overflow: hidden;
+        font-weight: 700; color: #fff; font-size: 24px; position: relative;
+      }
+      .foxy-profile-card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+      .foxy-profile-card-body {
+        padding: 12px 16px 16px;
+      }
+      .foxy-profile-card-username {
+        font-size: 18px; font-weight: 700; color: #fff;
+      }
+      .foxy-profile-card-tag {
+        font-size: 13px; color: #949ba4; font-weight: 600;
+      }
+      .foxy-profile-card-divider {
+        height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0;
+      }
+      .foxy-profile-card-section-title {
+        font-size: 11px; text-transform: uppercase; font-weight: 700; color: #b5bac1; margin-bottom: 6px;
+      }
+      .foxy-profile-card-section-text {
+        font-size: 13px; color: #dbdee1; line-height: 1.4;
+      }
+      .foxy-profile-card-activity-box {
+        background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px 10px; margin-top: 8px; display: flex; gap: 8px; align-items: center;
+      }
+
+      /* Voice Activity Speak Indicator CSS */
+      .foxy-avatar.speaking {
+        box-shadow: 0 0 0 2px var(--foxy-online);
+        animation: foxy-speaking-pulse 1.2s infinite ease-in-out;
+      }
+      @keyframes foxy-speaking-pulse {
+        0% { box-shadow: 0 0 0 0px rgba(35, 165, 89, 0.7); }
+        50% { box-shadow: 0 0 0 3px rgba(35, 165, 89, 0.4); }
+        100% { box-shadow: 0 0 0 0px rgba(35, 165, 89, 0); }
+      }
+
+      /* Webhook Styling / Bot tags */
+      .foxy-bot-tag {
+        background: var(--foxy-accent); color: #fff; font-size: 9px; font-weight: 700;
+        padding: 1px 4px; border-radius: 3px; margin-left: 4px; vertical-align: middle;
+      }
+      .foxy-webhook-embed {
+        border-left: 4px solid var(--foxy-accent); background: var(--foxy-surface-alt);
+        border-radius: 4px; padding: 10px 12px; margin-top: 6px; max-width: 480px;
+        box-sizing: border-box; display: flex; flex-direction: column; gap: 4px;
+      }
+      .foxy-webhook-embed-title { font-weight: 600; color: #fff; font-size: 14px; }
+      .foxy-webhook-embed-desc { color: var(--foxy-text-muted); font-size: 13px; }
+
       /* Inbox Notifications Popout */
       .foxy-inbox-popout {
         position: absolute; top: 40px; right: 10px; width: 280px; max-height: 320px;
@@ -459,7 +542,7 @@
       .status-dot.online { background: var(--foxy-online); }
       .status-dot.idle { background: var(--foxy-idle); }
       .status-dot.dnd { background: var(--foxy-dnd); }
-      .status-dot.offline { background: var(--foxy-offline); }
+      .status-dot.offline, .status-dot.invisible { background: var(--foxy-offline); }
       .foxy-member-info { display:flex; flex-direction:column; min-width:0; }
       .foxy-member-name { color: var(--foxy-text); font-size:14px; font-weight:500;
         white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -604,7 +687,7 @@
       .foxy-chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 14px 10px; }
       .foxy-chat-message { display: flex; gap: 12px; align-items: flex-start; padding: 4px 8px; border-radius: 4px; transition: background 0.1s; }
       .foxy-chat-message:hover { background: rgba(255,255,255,0.02); }
-      .foxy-chat-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; flex-shrink: 0; overflow: hidden; font-size: 15px; }
+      .foxy-chat-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; flex-shrink: 0; overflow: hidden; font-size: 15px; cursor: pointer; }
       .foxy-chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
       .foxy-chat-msg-header { display: flex; gap: 8px; align-items: baseline; }
       .foxy-chat-author { font-weight: 600; font-size: 14px; color: var(--foxy-text); cursor: pointer; }
@@ -686,6 +769,18 @@
       .foxy-account-name { font-size: 18px; font-weight: 700; color: var(--foxy-text); line-height: 1.2; }
       .foxy-account-tag { font-size: 13px; color: var(--foxy-text-muted); font-weight: 600; }
       .foxy-account-status { font-size: 12px; color: var(--foxy-online); font-weight: 600; margin-top: 4px; }
+
+      /* Connection Cards Dashboard */
+      .foxy-connection-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 12px;
+      }
+      .foxy-connection-card {
+        background: var(--foxy-surface-alt); border: 1px solid var(--foxy-divider); border-radius: 8px; padding: 12px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: transform .12s, border-color .12s;
+      }
+      .foxy-connection-card:hover { transform: translateY(-2px); border-color: var(--foxy-accent); }
+      .foxy-connection-card.connected { border-color: var(--foxy-online); background: rgba(35,165,89,0.05); }
+      .foxy-connection-username { font-size: 11px; font-weight: bold; color: var(--foxy-online); }
 
       /* Toggle Switches */
       .foxy-switch {
@@ -777,6 +872,101 @@
     }
   });
 
+  // ---------- DISCORD-STYLE HOVER/CLICK USER PROFILE CARDS ----------
+  let activeProfileCard = null;
+  function closeProfileCard() { activeProfileCard?.remove(); activeProfileCard = null; }
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".foxy-profile-card-popout") && !e.target.closest(".foxy-avatar") && !e.target.closest(".foxy-chat-author") && !e.target.closest(".foxy-member")) {
+      closeProfileCard();
+    }
+  });
+
+  function showProfileCard(x, y, user) {
+    closeProfileCard();
+    const card = document.createElement("div");
+    card.className = "foxy-profile-card-popout";
+    
+    const bannerStyle = user.bannerColor ? `background:${user.bannerColor}` : `background:var(--foxy-accent)`;
+    const bgCol = stringToColor(user.name);
+    
+    // Compile active connected accounts badges list
+    let badgesHTML = "";
+    if (user.isBot) badgesHTML += `<span class="foxy-profile-card-badge-pill" style="background:var(--foxy-accent)">BOT</span>`;
+    if (user.connectedAccounts) {
+      for (const [platform, account] of Object.entries(user.connectedAccounts)) {
+        if (account.connected) {
+          badgesHTML += `<span class="foxy-profile-card-badge-pill" title="${platform}: ${account.username}">${platform.toUpperCase()}</span>`;
+        }
+      }
+    }
+
+    card.innerHTML = `
+      <div class="foxy-profile-card-banner" style="${bannerStyle}">
+        <div class="foxy-profile-card-banner-badges">${badgesHTML}</div>
+      </div>
+      <div class="foxy-profile-card-avatar-wrap">
+        <div class="foxy-profile-card-avatar" style="background:${bgCol}">
+          ${user.avatar ? `<img src="${user.avatar}">` : user.name.slice(0, 1).toUpperCase()}
+        </div>
+      </div>
+      <div class="foxy-profile-card-body">
+        <div class="foxy-profile-card-username">${user.name}</div>
+        <div class="foxy-profile-card-tag">#${user.tag || "0001"}</div>
+        <div class="foxy-profile-card-divider"></div>
+        <div class="foxy-profile-card-section-title">About Me</div>
+        <div class="foxy-profile-card-section-text">${user.bio || "No biography details specified."}</div>
+        
+        ${user.activity ? `
+          <div class="foxy-profile-card-divider"></div>
+          <div class="foxy-profile-card-section-title">Playing A Game</div>
+          <div class="foxy-profile-card-activity-box">
+            <div style="background:var(--foxy-accent); border-radius:4px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:11px;">APP</div>
+            <div>
+              <div style="font-weight:700; font-size:13px; color:#fff">${user.activity}</div>
+              <div style="font-size:11px; color:#949ba4">Rich Presence Activated</div>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
+
+    document.body.appendChild(card);
+    card.style.left = x + "px"; card.style.top = y + "px";
+    
+    // Clamp coordinates to client viewport boundary metrics
+    const r = card.getBoundingClientRect();
+    if (r.right > innerWidth) card.style.left = (innerWidth - r.width - 12) + "px";
+    if (r.bottom > innerHeight) card.style.top = (innerHeight - r.height - 12) + "px";
+    
+    activeProfileCard = card;
+  }
+
+  // ---------- WEBHOOK DISPATCHER SYSTEM ----------
+  function registerWebhook({ name, avatar = null, channelId }) {
+    const id = "wh_" + Date.now() + Math.random().toString(36).slice(2, 6);
+    const wh = { id, name, avatar, channelId };
+    _webhooks.push(wh);
+    emit("webhookRegistered", wh);
+    return wh;
+  }
+
+  function executeWebhook(id, payload = {}) {
+    const wh = _webhooks.find(w => w.id === id);
+    if (!wh) {
+      showToast("Target webhook does not exist", { type: "error" });
+      return;
+    }
+    const message = {
+      author: payload.username || wh.name,
+      avatar: payload.avatar_url || wh.avatar,
+      text: payload.content || "",
+      isBot: true,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      embeds: payload.embeds || []
+    };
+    emit("messageReceived", wh.channelId, message);
+  }
+
   // ---------- EVENTS ----------
   function emit(eventName, ...args) { (_events[eventName]||[]).forEach(fn=>{ try{fn(...args);}catch(e){console.error(e);} }); }
   function on(eventName, fn) { if(!_events[eventName]) _events[eventName]=[]; _events[eventName].push(fn); }
@@ -812,10 +1002,6 @@
   document.addEventListener("click", closeContextMenu);
   document.addEventListener("contextmenu", e => { if (!e.target.closest(".foxy-context-menu")) closeContextMenu(); });
 
-  /**
-   * showContextMenu(x, y, items)
-   * items: [{label, icon?, onClick?, danger?, divider?}, ...]
-   */
   function showContextMenu(x, y, items) {
     closeContextMenu();
     const menu = document.createElement("div");
@@ -830,7 +1016,6 @@
     });
     menu.style.left = x + "px"; menu.style.top = y + "px";
     document.body.appendChild(menu);
-    // Clamp to viewport
     const r = menu.getBoundingClientRect();
     if (r.right > innerWidth) menu.style.left = (innerWidth - r.width - 8) + "px";
     if (r.bottom > innerHeight) menu.style.top = (innerHeight - r.height - 8) + "px";
@@ -839,10 +1024,6 @@
   }
 
   // ---------- MODAL ----------
-  /**
-   * showModal({title, body, buttons:[{label, variant?, onClick?}], closable?})
-   * body can be string (HTML) or HTMLElement
-   */
   function showModal({ title = "Modal", body = "", buttons = [{ label: "OK", variant: "primary" }], closable = true } = {}) {
     const backdrop = document.createElement("div");
     backdrop.className = "foxy-modal-backdrop";
@@ -912,7 +1093,6 @@
       if (filtered.length === 0) { list.innerHTML = `<div class="foxy-cmdk-empty">No commands</div>`; return; }
       if (activeIdx >= filtered.length) activeIdx = 0;
 
-      // Group commands by category (Shadcn cmdk style)
       const categories = {};
       filtered.forEach((c, idx) => {
         const cat = c.category || "General";
@@ -976,8 +1156,12 @@
   }
 
   // ---------- MEMBERS / PRESENCE ----------
-  function addMember({ id, name, avatar = null, status = "offline", activity = "" }) {
-    const m = { id: id || "m_" + Date.now() + Math.random().toString(36).slice(2, 6), name, avatar, status, activity };
+  function addMember({ id, name, avatar = null, status = "offline", activity = "", bio = "Foxy member profile.", bannerColor = "#5865f2" }) {
+    const m = { 
+      id: id || "m_" + Date.now() + Math.random().toString(36).slice(2, 6), 
+      name, avatar, status, activity, bio, bannerColor,
+      connectedAccounts: { ..._settings.connections }
+    };
     _members.push(m);
     emit("memberAdded", m);
     return m;
@@ -1002,7 +1186,6 @@
 
     const hasOpenWindows = Object.keys(_windows).length > 0;
     if (hasOpenWindows) {
-      // Increment Inbox badge counters on all open Discord-layout windows
       for (const winId in _windows) {
         const win = _windows[winId];
         const badge = win.el.querySelector(".foxy-inbox-badge");
@@ -1014,7 +1197,6 @@
       }
       emit("notificationReceived", notificationObj);
     } else {
-      // Fallback: If closed (no windows on screen), fallback to standard toast notification
       showToast(`${author}: ${message}`, { type: "info" });
     }
   }
@@ -1029,7 +1211,6 @@
       if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
       const text = await response.text();
 
-      // Extract raw remote version matches
       let remoteVersion = null;
       const metaMatch = text.match(/version:\s*([0-9.]+)/i);
       const libMatch = text.match(/_version:\s*([0-9.]+)/i);
@@ -1044,10 +1225,9 @@
         return null;
       }
 
-      const localVersion = window.FoxyUI ? window.FoxyUI._version : 23;
+      const localVersion = window.FoxyUI ? window.FoxyUI._version : 25;
       const updateAvailable = remoteVersion > localVersion;
 
-      // Extract remote changelog strings
       let changelog = [];
       const changelogMatch = text.match(/changelog:\s*\[([\s\S]*?)\]/);
       if (changelogMatch) {
@@ -1149,18 +1329,6 @@
   addKeybind("ctrl+z", undoMerge, "Undo window merge");
 
   // ---------- WINDOW CREATION ----------
-  /**
-   * createWindow({
-   *   title, width, height, icon,
-   *   layout: "discord" | null,
-   *   servers:[{id, name, icon?, iconKey?, home?, onClick?}],
-   *   channels:[{id, name, category?, onClick?}],
-   *   members: boolean | array — whether to show member list (or pass array directly),
-   *   memberList: optional explicit member array (else uses global _members)
-   *   tabs: [{name, html, icon?}, ...] — direct instantiation declaration,
-   *   currentUser: optional object representing local active user identity
-   * })
-   */
   function createWindow(options = {}) {
     const {
       title = "Foxy Window", width = 720, height = 480, icon = null,
@@ -1175,7 +1343,6 @@
     let finalMembers = members;
     let finalUser = currentUser;
 
-    // Apply "discord" layout presets
     if (layout === "discord") {
       if (finalServers === null) {
         finalServers = [
@@ -1189,7 +1356,18 @@
       if (finalChannels === null) finalChannels = [];
       if (finalMembers === false) finalMembers = true;
       if (finalUser === null) {
-        finalUser = { name: "Guest Fox", tag: "0001", status: "online", muted: false, deafened: false };
+        finalUser = { 
+          id: "local_user",
+          name: "Guest Fox", 
+          tag: "0001", 
+          status: "online", 
+          muted: false, 
+          deafened: false,
+          bio: "Just a happy virtual interface explorer.",
+          bannerColor: "#5865f2",
+          activity: "",
+          connectedAccounts: { ..._settings.connections }
+        };
       }
     }
 
@@ -1351,7 +1529,6 @@
         const items = this.channelList.querySelector(".foxy-channel-items");
         items.innerHTML = "";
         
-        // Track categories and their child items for collapsible accordion logic
         let currentCatEl = null;
         let currentCatName = null;
 
@@ -1364,7 +1541,6 @@
             items.appendChild(ch);
             currentCatEl = ch;
             
-            // Toggle accordion state
             ch.onclick = () => {
               const isCollapsed = ch.classList.toggle("collapsed");
               ch.innerHTML = `${getIcon(isCollapsed ? "chevronRight" : "chevronDown", {size: 10, color: "var(--foxy-text-muted)"})} <span style="margin-left: 4px;">${c.category}</span>`;
@@ -1418,7 +1594,7 @@
       setMembers(list) {
         if (!this.memberListEl) return;
         const arr = list || memberList || _members;
-        const groups = { online: [], idle: [], dnd: [], offline: [] };
+        const groups = { online: [], idle: [], dnd: [], offline: [], invisible: [] };
         arr.forEach(m => { (groups[m.status] || groups.offline).push(m); });
         const order = [["online", "Online"], ["idle", "Idle"], ["dnd", "Do Not Disturb"], ["offline", "Offline"]];
         this.memberListEl.innerHTML = "";
@@ -1438,10 +1614,17 @@
                 <div class="foxy-member-name">${m.name}</div>
                 ${m.activity ? `<div class="foxy-member-activity">${m.activity}</div>` : ''}
               </div>`;
+            
+            row.querySelector(".foxy-avatar").onclick = (e) => {
+              e.stopPropagation();
+              const rect = row.getBoundingClientRect();
+              showProfileCard(rect.left - 310, rect.top, m);
+            };
+
             row.addEventListener("contextmenu", e => {
               e.preventDefault();
               showContextMenu(e.clientX, e.clientY, [
-                { label: m.name, icon: "👤" },
+                { label: m.name, icon: "👤", onClick: () => showProfileCard(e.clientX, e.clientY, m) },
                 { divider: true },
                 { label: "Message", icon: "💬", onClick: () => showToast(`Messaging ${m.name}`) },
                 { label: "Mention", icon: "@", onClick: () => showToast(`@${m.name} mentioned`) },
@@ -1464,13 +1647,13 @@
         const deafIcon = user.deafened ? getIcon("headsetOff", {size:15}) : getIcon("headset", {size:15});
 
         userBar.innerHTML = `
-          <div class="foxy-avatar" style="width:32px; height:32px; background:${stringToColor(user.name)}">
+          <div class="foxy-avatar local-user-avatar" style="width:32px; height:32px; cursor:pointer; background:${stringToColor(user.name)}">
             ${avatarContent}
             <span class="status-dot ${user.status || 'online'}"></span>
           </div>
           <div class="foxy-member-info" style="gap:0">
             <div class="foxy-member-name" style="font-weight:600; font-size:13px">${user.name}</div>
-            <div class="foxy-member-activity" style="font-size:11px">#${user.tag || "0001"}</div>
+            <div class="foxy-member-activity" style="font-size:11px">${user.activity ? user.activity : `#${user.tag || "0001"}`}</div>
           </div>
           <div class="foxy-user-bar-controls">
             <div class="foxy-user-bar-btn toggle-mic" title="Mute/Unmute">${muteIcon}</div>
@@ -1479,6 +1662,11 @@
           </div>
         `;
 
+        userBar.querySelector(".local-user-avatar").onclick = (e) => {
+          e.stopPropagation();
+          const rect = userBar.getBoundingClientRect();
+          showProfileCard(rect.left + 10, rect.top - 280, user);
+        };
         userBar.querySelector(".toggle-mic").onclick = () => {
           user.muted = !user.muted;
           this.setUserProfile(user);
@@ -1557,27 +1745,62 @@
         container.appendChild(inputWrap);
 
         const renderMessages = (list) => {
-          msgList.innerHTML = list.map(m => {
+          msgList.innerHTML = list.map((m, idx) => {
             const authorColor = stringToColor(m.author);
             const avText = (m.author || "?").slice(0, 1).toUpperCase();
             const avImg = m.avatar ? `<img src="${m.avatar}">` : avText;
             const mentionStyle = m.isMentioned ? "background:rgba(242, 63, 67, 0.15); border-left:3px solid var(--foxy-mention);" : "";
+            
+            // Build visual mock embeds for webhook-compatible messages
+            let embedsHTML = "";
+            if (m.embeds && m.embeds.length > 0) {
+              embedsHTML = m.embeds.map(emb => `
+                <div class="foxy-webhook-embed">
+                  ${emb.title ? `<div class="foxy-webhook-embed-title">${emb.title}</div>` : ''}
+                  ${emb.description ? `<div class="foxy-webhook-embed-desc">${emb.description}</div>` : ''}
+                </div>
+              `).join("");
+            }
+
             return `
-              <div class="foxy-chat-message" style="${mentionStyle}">
+              <div class="foxy-chat-message" style="${mentionStyle}" data-msg-idx="${idx}">
                 <div class="foxy-chat-avatar" style="background:${authorColor}">
                   ${avImg}
                 </div>
                 <div style="flex:1; min-width:0;">
                   <div class="foxy-chat-msg-header">
                     <span class="foxy-chat-author">${m.author}</span>
+                    ${m.isBot ? `<span class="foxy-bot-tag">BOT</span>` : ''}
                     <span class="foxy-chat-time">${m.timestamp || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                   </div>
                   <div class="foxy-chat-msg-text">${m.text}</div>
+                  ${embedsHTML}
                 </div>
               </div>
             `;
           }).join("");
+          
           msgList.scrollTop = msgList.scrollHeight;
+
+          // Wire profile trigger callbacks on clicking username or avatar
+          msgList.querySelectorAll(".foxy-chat-message").forEach(el => {
+            const idx = parseInt(el.dataset.msgIdx);
+            const m = list[idx];
+            if (!m) return;
+            const handler = (e) => {
+              e.stopPropagation();
+              const rect = el.getBoundingClientRect();
+              showProfileCard(rect.left + 50, rect.top, {
+                name: m.author,
+                avatar: m.avatar,
+                tag: m.isBot ? "BOT" : "0001",
+                bio: m.isBot ? "A dynamic automated webhook agent integration." : "Server member.",
+                isBot: m.isBot
+              });
+            };
+            el.querySelector(".foxy-chat-avatar").onclick = handler;
+            el.querySelector(".foxy-chat-author").onclick = handler;
+          });
         };
 
         const txt = inputWrap.querySelector("textarea");
@@ -1600,13 +1823,14 @@
         const view = document.createElement("div");
         view.className = "foxy-settings-viewport";
         
-        // Build settings sidebars dynamically from default sections and custom segments
         const defaultSections = [
           { id: "my-account", label: "My Account", category: "User Settings", icon: "user" },
+          { id: "connections", label: "Connections", category: "User Settings", icon: "link" },
+          { id: "webhooks", label: "Webhooks", category: "App Settings", icon: "webhook" },
           { id: "appearance", label: "Appearance", category: "App Settings", icon: "palette" },
           { id: "voice", label: "Voice & Video", category: "App Settings", icon: "headset" },
           { id: "plugins", label: "Plugins", category: "App Settings", icon: "box" },
-          { id: "updates", label: "Updates", category: "App Settings", icon: "history" }, // Integrated section
+          { id: "updates", label: "Updates", category: "App Settings", icon: "history" },
           { id: "changelog", label: "Changelog", category: "Information", icon: "sparkles" },
           { id: "about", label: "About FoxyUI", category: "Information", icon: "discord" }
         ];
@@ -1651,9 +1875,9 @@
           if (sectionKey === "my-account") {
             return `
               <h2 class="foxy-settings-title">My Account</h2>
-              <p class="foxy-settings-subtitle">Update your profile details and personalize how your identity appears across Discord-style layouts.</p>
+              <p class="foxy-settings-subtitle">Customize your virtual avatar identity, banner cosmetics, and statuses.</p>
               <div class="foxy-account-card">
-                <div class="foxy-account-banner"></div>
+                <div class="foxy-account-banner" style="background:${user.bannerColor || 'var(--foxy-accent)'}"></div>
                 <div class="foxy-account-main">
                   <div class="foxy-account-avatar" style="background:${stringToColor(user.name)}">
                     ${user.avatar ? `<img src="${user.avatar}">` : (user.name || "?").slice(0, 1).toUpperCase()}
@@ -1661,7 +1885,7 @@
                   <div class="foxy-account-meta">
                     <div class="foxy-account-name">${user.name}</div>
                     <div class="foxy-account-tag">#${user.tag || "0001"}</div>
-                    <div class="foxy-account-status">● Active Profile</div>
+                    <div class="foxy-account-status">● status: ${user.status || 'online'}</div>
                   </div>
                 </div>
               </div>
@@ -1675,7 +1899,93 @@
                   <label class="foxy-settings-label">Custom Tag</label>
                   <input type="text" id="setting-input-tag" value="${user.tag || "0001"}" style="max-width:320px">
                 </div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Status Presence</label>
+                  <select id="setting-select-status" style="max-width:320px">
+                    <option value="online" ${user.status === 'online' ? 'selected':''}>Online</option>
+                    <option value="idle" ${user.status === 'idle' ? 'selected':''}>Idle</option>
+                    <option value="dnd" ${user.status === 'dnd' ? 'selected':''}>Do Not Disturb</option>
+                    <option value="invisible" ${user.status === 'invisible' ? 'selected':''}>Invisible</option>
+                  </select>
+                </div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Active Activity (Playing...)</label>
+                  <input type="text" id="setting-input-activity" value="${user.activity || ''}" placeholder="Minecraft, VS Code..." style="max-width:320px">
+                </div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">About Me (Bio)</label>
+                  <textarea id="setting-text-bio" style="max-width:320px; min-height:60px;">${user.bio || ''}</textarea>
+                </div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Banner Color (HEX)</label>
+                  <input type="color" id="setting-color-banner" value="${user.bannerColor || '#5865f2'}" style="width:60px; height:36px; padding:0; border:none; background:none; cursor:pointer;">
+                </div>
                 <button id="setting-save-account" style="max-width:140px; margin-top:10px">Save Changes</button>
+              </div>
+            `;
+          }
+          if (sectionKey === "connections") {
+            const gitConn = _settings.connections.github.connected;
+            const twiConn = _settings.connections.twitch.connected;
+            const ytConn = _settings.connections.youtube.connected;
+
+            return `
+              <h2 class="foxy-settings-title">Connected Accounts</h2>
+              <p class="foxy-settings-subtitle">Link external social applications to showcase connected accounts inside your user popout profiles.</p>
+              
+              <div class="foxy-connection-grid">
+                <div class="foxy-connection-card ${gitConn ? 'connected':''}" data-platform="github">
+                  ${getIcon("github", {size:24})}
+                  <div style="font-size:12px; font-weight:600;">GitHub</div>
+                  ${gitConn ? `<div class="foxy-connection-username">${_settings.connections.github.username}</div>` : `<div style="font-size:10px; color:var(--foxy-text-muted);">Unlinked</div>`}
+                </div>
+                <div class="foxy-connection-card ${twiConn ? 'connected':''}" data-platform="twitch">
+                  ${getIcon("twitchLogo", {size:24})}
+                  <div style="font-size:12px; font-weight:600;">Twitch</div>
+                  ${twiConn ? `<div class="foxy-connection-username">${_settings.connections.twitch.username}</div>` : `<div style="font-size:10px; color:var(--foxy-text-muted);">Unlinked</div>`}
+                </div>
+                <div class="foxy-connection-card ${ytConn ? 'connected':''}" data-platform="youtube">
+                  ${getIcon("youtube", {size:24})}
+                  <div style="font-size:12px; font-weight:600;">YouTube</div>
+                  ${ytConn ? `<div class="foxy-connection-username">${_settings.connections.youtube.username}</div>` : `<div style="font-size:10px; color:var(--foxy-text-muted);">Unlinked</div>`}
+                </div>
+              </div>
+            `;
+          }
+          if (sectionKey === "webhooks") {
+            const whRows = _webhooks.map((w, idx) => `
+              <div class="foxy-card" style="justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-weight:700;">${w.name}</div>
+                  <div style="font-size:11px; color:var(--foxy-text-muted);">ID: ${w.id} | Channel: #${w.channelId}</div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button class="secondary webhook-btn-test" data-id="${w.id}" style="padding:4px 8px; font-size:12px;">Test Message</button>
+                  <button class="danger webhook-btn-delete" data-id="${w.id}" style="padding:4px 8px; font-size:12px;">Delete</button>
+                </div>
+              </div>
+            `).join("");
+
+            return `
+              <h2 class="foxy-settings-title">Webhooks & Integrations</h2>
+              <p class="foxy-settings-subtitle">Configure bot endpoints to send automated messages to specific chat feeds.</p>
+              
+              <div class="foxy-settings-block">
+                <div class="foxy-settings-block-title">Create Webhook</div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Webhook Agent Name</label>
+                  <input type="text" id="webhook-new-name" placeholder="FoxyBot" style="max-width:320px">
+                </div>
+                <div class="foxy-settings-field">
+                  <label class="foxy-settings-label">Channel Identifier Assignment</label>
+                  <input type="text" id="webhook-new-channel" placeholder="general" style="max-width:320px">
+                </div>
+                <button id="webhook-btn-create" style="margin-top:8px;">Generate Webhook</button>
+              </div>
+
+              <div style="margin-top:20px;">
+                <div class="foxy-settings-block-title">Active Webhooks (${_webhooks.length})</div>
+                ${whRows || `<div style="text-align:center; padding:20px; color:var(--foxy-text-muted);">No webhooks registered.</div>`}
               </div>
             `;
           }
@@ -1811,20 +2121,15 @@
               <h2 style="margin-top:0; font-size:20px; font-weight:700">Changelog — Version History</h2>
               <div style="margin-top:20px; display:flex; flex-direction:column; gap:20px">
                 <div>
-                  <div style="background:var(--foxy-accent); color:#fff; display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v23.0 Discord UI Refresh</div>
-                  <h3 style="margin:0 0 6px 0; font-size:16px">Discord-style Icons & Settings Polish</h3>
-                  <p style="color:var(--foxy-text-muted); font-size:14px; margin:0 0 8px 0">Released on June 1, 2026.</p>
+                  <div style="background:var(--foxy-accent); color:#fff; display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v25.0 Major Overhaul</div>
+                  <h3 style="margin:0 0 6px 0; font-size:16px">Integrations, Webhooks, Profile Cards & Audio Feedback</h3>
+                  <p style="color:var(--foxy-text-muted); font-size:14px; margin:0 0 8px 0">Released on June 2, 2026.</p>
                   <ul style="margin:0; padding-left:20px; color:var(--foxy-text); font-size:13px; line-height:1.6">
-                    <li><strong>Expanded Built-in Icons:</strong> Added Discord-oriented icon keys including home, Discord mark, user, palette, monitor, history, and more.</li>
-                    <li><strong>Server Rail Icon Support:</strong> Server and tab icons now support both image URLs and built-in icon keys via <code>icon</code>/<code>iconKey</code>.</li>
-                    <li><strong>My Account Redesign:</strong> Introduced a Discord-like account card with banner, profile avatar treatment, and grouped profile controls.</li>
-                    <li><strong>Appearance & Settings Restyle:</strong> Upgraded settings navigation and appearance controls with cleaner Discord-inspired sections and hierarchy.</li>
+                    <li><strong>Webhook Pipeline:</strong> Complete support for dispatching mock webhook requests and embedding elements into open channel feeds.</li>
+                    <li><strong>Interactive Profile Cards:</strong> Floating user cards triggered by clicking chat usernames or avatars.</li>
+                    <li><strong>Connected Accounts:</strong> Link GitHub, Twitch, and YouTube credentials.</li>
+                    <li><strong>Audio Speaking Ring:</strong> Speaking-state toggle visual animations around active speakers.</li>
                   </ul>
-                </div>
-                <hr style="border:0; border-top:1px solid var(--foxy-divider); margin:10px 0">
-                <div>
-                  <div style="background:var(--foxy-surface-alt); color:var(--foxy-text-muted); display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v22.0 Archive</div>
-                  <h3 style="margin:0 0 6px 0; font-size:16px">Parity Fluid Animated Themes</h3>
                 </div>
               </div>
             `;
@@ -1838,14 +2143,10 @@
                 <h3 style="margin-top:0; font-size:14px; font-weight:700; text-transform:uppercase; color:var(--foxy-accent)">Technical Credits</h3>
                 <p style="margin:0; font-size:13px; line-height:1.6; color:var(--foxy-text)">
                   <strong>Core Architecture:</strong> FoxyUI Developer & Open Source Contributors<br>
-                  <strong>Release Version:</strong> v23.0.0 (Stateless Engine)<br>
+                  <strong>Release Version:</strong> v25.0.0 (Stateless Engine)<br>
                   <strong>License:</strong> MIT Open Source License<br>
                   <strong>Aesthetics:</strong> Inspired by Discord design specifications
                 </p>
-              </div>
-
-              <div style="margin-top:24px; text-align:center; color:var(--foxy-text-muted); font-size:12px">
-                Made with ❤️ for high-performance virtual desktop rendering.
               </div>
             `;
           }
@@ -1866,7 +2167,6 @@
           item.onclick = () => setSection(item.dataset.section);
         });
 
-        // Event listener for live inputs and range sliders
         inner.addEventListener("input", (e) => {
           if (e.target.id === "setting-range-blur") {
             _settings.blur = e.target.value + "px";
@@ -1917,14 +2217,87 @@
         });
 
         inner.addEventListener("click", (e) => {
+          // Account saving handler
           if (e.target.id === "setting-save-account") {
             const nameVal = view.querySelector("#setting-input-name").value.trim();
             const tagVal = view.querySelector("#setting-input-tag").value.trim();
+            const statVal = view.querySelector("#setting-select-status").value;
+            const actVal = view.querySelector("#setting-input-activity").value.trim();
+            const bioVal = view.querySelector("#setting-text-bio").value.trim();
+            const colVal = view.querySelector("#setting-color-banner").value;
+
             if (nameVal) {
               user.name = nameVal;
               user.tag = tagVal || "0001";
+              user.status = statVal;
+              user.activity = actVal;
+              user.bio = bioVal;
+              user.bannerColor = colVal;
               this.setUserProfile(user);
               showToast("Account saved!", { type: "success" });
+              setSection("my-account");
+            }
+          }
+          // Connection link handler
+          const connCard = e.target.closest(".foxy-connection-card");
+          if (connCard) {
+            const plat = connCard.dataset.platform;
+            const targetState = !_settings.connections[plat].connected;
+            
+            if (targetState) {
+              const inp = document.createElement("input");
+              inp.placeholder = "Enter account name...";
+              showModal({
+                title: `Connect ${plat.toUpperCase()}`,
+                body: inp,
+                buttons: [
+                  { label: "Cancel", variant: "secondary" },
+                  { label: "Connect", onClick: () => {
+                      const username = inp.value.trim();
+                      if (username) {
+                        _settings.connections[plat] = { connected: true, username };
+                        user.connectedAccounts[plat] = { connected: true, username };
+                        showToast(`Connected ${plat}!`, { type: "success" });
+                        setSection("connections");
+                      }
+                    }
+                  }
+                ]
+              });
+            } else {
+              _settings.connections[plat] = { connected: false, username: "" };
+              user.connectedAccounts[plat] = { connected: false, username: "" };
+              showToast(`Disconnected ${plat}`, { type: "info" });
+              setSection("connections");
+            }
+          }
+          // Webhook execution handlers
+          if (e.target.id === "webhook-btn-create") {
+            const name = view.querySelector("#webhook-new-name").value.trim();
+            const channel = view.querySelector("#webhook-new-channel").value.trim();
+            if (name && channel) {
+              registerWebhook({ name, channelId: channel });
+              showToast(`Webhook "${name}" registered!`, { type: "success" });
+              setSection("webhooks");
+            } else {
+              showToast("Provide both webhook name and target channel id", { type: "error" });
+            }
+          }
+          if (e.target.classList.contains("webhook-btn-test")) {
+            const whId = e.target.dataset.id;
+            executeWebhook(whId, {
+              content: "Beep boop! This is a dynamic test dispatch message from FoxyUI v25 webhook pipeline.",
+              embeds: [{ title: "Embedded Integration", description: "Standard webhook embedded payloads display flawlessly here." }]
+            });
+            showToast("Webhook test payload executed!", { type: "success" });
+          }
+          if (e.target.classList.contains("webhook-btn-delete")) {
+            const whId = e.target.dataset.id;
+            const idx = _webhooks.findIndex(w => w.id === whId);
+            if (idx > -1) {
+              _webhooks.splice(idx, 1);
+              showToast("Webhook deleted.", { type: "info" });
+              setSection("webhooks");
             }
           }
           if (e.target.id === "setting-btn-checknow") {
@@ -1939,6 +2312,16 @@
         });
 
         view.querySelector(".foxy-settings-close-btn").onclick = () => { view.remove(); };
+      },
+      setAvatarSpeaking(memberId, isSpeaking) {
+        const query = this.memberListEl ? this.memberListEl.querySelectorAll(".foxy-avatar") : [];
+        query.forEach(av => {
+          const nameEl = av.parentElement.querySelector(".foxy-member-name");
+          if (nameEl && nameEl.textContent === memberId) {
+            if (isSpeaking) av.classList.add("speaking");
+            else av.classList.remove("speaking");
+          }
+        });
       },
       close() {
         delete _windows[id]; el.remove();
@@ -2006,7 +2389,6 @@
       document.addEventListener("mousemove", e => { if (dragging) { el.style.left = (e.clientX - offsetX) + "px"; el.style.top = (e.clientY - offsetY) + "px"; } });
     }
 
-    // Right-click on header → window context menu
     el.querySelector(".foxy-header").addEventListener("contextmenu", e => {
       e.preventDefault();
       showContextMenu(e.clientX, e.clientY, [
@@ -2095,46 +2477,34 @@
   registerCommand({ id: "theme.nebula", label: "Theme: Nebula (Animated)", category: "Appearance", onRun: () => setTheme("nebula") });
   registerCommand({ id: "theme.twitch", label: "Theme: Twitch", category: "Appearance", onRun: () => setTheme("twitch") });
   registerCommand({ id: "theme.imgui", label: "Theme: ImGui", category: "Appearance", onRun: () => setTheme("imgui") });
-  registerCommand({ id: "toast.demo", label: "Show demo toast", category: "Utility", onRun: () => showToast("Hello from FoxyUI v23", { type: "success" }) });
+  registerCommand({ id: "toast.demo", label: "Show demo toast", category: "Utility", onRun: () => showToast("Hello from FoxyUI v25", { type: "success" }) });
 
   // ---------- EXPORT ----------
   window.FoxyUI = {
-    _version: 23,
+    _version: 25,
     _windows, _toasts, _settings, _plugins, _keybinds, _commands, _members, THEMES,
-    // icons
     getIcon,
-    // notify pipeline
     notify,
-    // updates
     checkForUpdates,
-    // windows
     createWindow,
-    // toast
     showToast,
-    // keybinds
     addKeybind,
-    // theming
     setTheme, setAccent, registerTheme, getThemes,
-    // members
     addMember, removeMember, setMemberStatus, getMembers,
-    // custom settings
     registerSettingsSection,
-    // context menu + modal
     showContextMenu, closeContextMenu, showModal, confirmModal,
-    // command palette
     registerCommand, openCommandPalette,
-    // plugins
     registerPlugin, loadPluginFromURL,
-    // events
     emit, on, off,
-    // merging
-    undoMerge
+    undoMerge,
+    
+    // Webhook Pipelines
+    registerWebhook,
+    executeWebhook
   };
   
-  console.log("%c🦊 FoxyUI v23 loaded — Discord-style icon suite & settings refresh initialized", "color:#5865f2;font-weight:700;font-size:13px");
+  console.log("%c🦊 FoxyUI v25 loaded — Premium Integrations & Profile Engines Initialized", "color:#5865f2;font-weight:700;font-size:13px");
 
-  // ---------- INITIALIZATION ACTIONS ----------
-  // Background asynchronous verification of the repository update status on initialization
   if (_settings.autoCheckUpdates) {
     setTimeout(() => {
       checkForUpdates(true);
