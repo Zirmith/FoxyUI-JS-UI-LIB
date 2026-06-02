@@ -1,12 +1,13 @@
-/* FoxyUI v26 — Discord-flavored & ImGui-flavored stateless UI library
+/* FoxyUI v27 — Discord-flavored & ImGui-flavored stateless UI library
  * Adds: Premium Animated Light and Animated Dark themes, fluid CSS gradient transition matrices,
  * customizable backdrop metrics, collapsible category sidebar accordions, non-blocking absolute tooltips, 
  * categorized command palettes, extensible Settings API wrappers, Webhook executors, 
- * hover profile cards, live voice-activity rings, Connected Accounts dashboard, and modular ImGui developer layouts.
+ * hover profile cards, live voice-activity rings, Connected Accounts dashboard, 
+ * modular ImGui developer layouts, custom ImGui themes, CRT scanline emulation, and live performance telemetry.
  */
 (() => {
-  if (window.FoxyUI && window.FoxyUI._version >= 26) {
-    console.warn("FoxyUI v26 already loaded~");
+  if (window.FoxyUI && window.FoxyUI._version >= 27) {
+    console.warn("FoxyUI v27 already loaded~");
     return;
   }
 
@@ -159,6 +160,66 @@
       toastInfo: "#4296fa", toastSuccess: "#5ec05e", toastError: "#ff5f5f",
       online: "#5ec05e", idle: "#f0c04f", dnd: "#ff5f5f", offline: "#7f7f7f",
       divider: "rgba(255, 255, 255, 0.1)", mention: "#ff8a3d"
+    },
+    
+    // ---------- IMGUI LAYOUT EXCLUSIVE THEMES (v27) ----------
+    imgui_classic: {
+      windowBg: "#1e1e1e", surface: "#2a2a2a", surfaceAlt: "#151515",
+      text: "#f0f0f0", textMuted: "#aaaaaa", header: "#2d2d2d",
+      tabActive: "#4296fa", tabInactive: "#aaaaaa", tabHover: "#3d3d3d",
+      inputBg: "#151515", inputBorder: "#444444", buttonBg: "#3f3f46",
+      buttonHover: "#4f4f58", buttonText: "#ffffff", placeholder: "#666",
+      accent: "#4296fa", accentHover: "#2f7fd8",
+      toastInfo: "#4296fa", toastSuccess: "#5ec05e", toastError: "#ff5f5f",
+      online: "#5ec05e", idle: "#f0c04f", dnd: "#ff5f5f", offline: "#7f7f7f",
+      divider: "rgba(255, 255, 255, 0.1)", mention: "#ff8a3d"
+    },
+    imgui_cherry: {
+      windowBg: "#221212", surface: "#321a1a", surfaceAlt: "#1a0c0c",
+      text: "#f5e6e6", textMuted: "#b58f8f", header: "#3d1f1f",
+      tabActive: "#e51c23", tabInactive: "#b58f8f", tabHover: "#4a2626",
+      inputBg: "#1a0c0c", inputBorder: "#5c2a2a", buttonBg: "#4a2626",
+      buttonHover: "#5c2f2f", buttonText: "#ffffff", placeholder: "#7a4040",
+      accent: "#e51c23", accentHover: "#d0171e",
+      toastInfo: "#e51c23", toastSuccess: "#5ec05e", toastError: "#e51c23",
+      online: "#23a559", idle: "#f0b232", dnd: "#e51c23", offline: "#7a4040",
+      divider: "rgba(229, 28, 35, 0.15)", mention: "#ff8a3d"
+    },
+    imgui_amber: {
+      windowBg: "#140c00", surface: "#1f1400", surfaceAlt: "#0a0600",
+      text: "#ffb300", textMuted: "#b37d00", header: "#2e1e00",
+      tabActive: "rgba(255, 179, 0, 0.25)", tabInactive: "#b37d00", tabHover: "#3d2700",
+      inputBg: "#0a0600", inputBorder: "#ffb300", buttonBg: "#2e1e00",
+      buttonHover: "#3d2700", buttonText: "#ffb300", placeholder: "#805a00",
+      accent: "#ffb300", accentHover: "#e6a100",
+      toastInfo: "#ffb300", toastSuccess: "#ffb300", toastError: "#ff3300",
+      online: "#ffb300", idle: "#ffcc00", dnd: "#ff3300", offline: "#805a00",
+      divider: "rgba(255, 179, 0, 0.2)", mention: "#ff3300"
+    },
+    imgui_matrix: {
+      windowBg: "#051105", surface: "#0a1f0a", surfaceAlt: "#020802",
+      text: "#00ff00", textMuted: "#00b300", header: "#0d2d0d",
+      tabActive: "rgba(0, 255, 0, 0.25)", tabInactive: "#00b300", tabHover: "#123d12",
+      inputBg: "#020802", inputBorder: "#00ff00", buttonBg: "#0d2d0d",
+      buttonHover: "#123d12", buttonText: "#00ff00", placeholder: "#008000",
+      accent: "#00ff00", accentHover: "#00e600",
+      toastInfo: "#00ff00", toastSuccess: "#00ff00", toastError: "#ff0000",
+      online: "#00ff00", idle: "#00ff00", dnd: "#ff0000", offline: "#008000",
+      divider: "rgba(0, 255, 0, 0.2)", mention: "#00ff00"
+    },
+    imgui_scanline: {
+      windowBg: "linear-gradient(180deg, #090e09 0%, #030603 100%)",
+      bgSize: "100% 100%",
+      animation: "foxy-crt-flicker 0.15s infinite",
+      surface: "rgba(10, 22, 10, 0.8)", surfaceAlt: "rgba(3, 8, 3, 0.9)",
+      text: "#33ff33", textMuted: "#11aa11", header: "#091209",
+      tabActive: "rgba(51, 255, 51, 0.25)", tabInactive: "#11aa11", tabHover: "rgba(51, 255, 51, 0.12)",
+      inputBg: "rgba(3, 8, 3, 0.9)", inputBorder: "#33ff33", buttonBg: "#0d1a0d",
+      buttonHover: "#122a12", buttonText: "#33ff33", placeholder: "#085508",
+      accent: "#33ff33", accentHover: "#22dd22",
+      toastInfo: "#33ff33", toastSuccess: "#33ff33", toastError: "#ff2222",
+      online: "#33ff33", idle: "#33ff33", dnd: "#ff2222", offline: "#085508",
+      divider: "rgba(51, 255, 51, 0.15)", mention: "#33ff33"
     }
   };
 
@@ -177,6 +238,14 @@
       twitch: { connected: false, username: "" },
       youtube: { connected: false, username: "" },
       spotify: { connected: false, username: "" }
+    },
+    
+    // ImGui Panel Display settings configuration
+    imguiPanels: {
+      explorer: true,
+      inspector: true,
+      crt: false,
+      crtOpacity: 0.15
     }
   };
   const _plugins = [];
@@ -1110,6 +1179,7 @@
     const bannerStyle = user.bannerColor ? `background:${user.bannerColor}` : `background:var(--foxy-accent)`;
     const bgCol = stringToColor(user.name);
     
+    // Compile active connected accounts badges list
     let badgesHTML = "";
     if (user.isBot) badgesHTML += `<span class="foxy-profile-card-badge-pill" style="background:var(--foxy-accent)">BOT</span>`;
     if (user.connectedAccounts) {
@@ -1153,6 +1223,7 @@
     document.body.appendChild(card);
     card.style.left = x + "px"; card.style.top = y + "px";
     
+    // Clamp coordinates to client viewport boundary metrics
     const r = card.getBoundingClientRect();
     if (r.right > innerWidth) card.style.left = (innerWidth - r.width - 12) + "px";
     if (r.bottom > innerHeight) card.style.top = (innerHeight - r.height - 12) + "px";
@@ -1167,23 +1238,6 @@
     _webhooks.push(wh);
     emit("webhookRegistered", wh);
     return wh;
-  }
-
-  function executeWebhook(id, payload = {}) {
-    const wh = _webhooks.find(w => w.id === id);
-    if (!wh) {
-      showToast("Target webhook does not exist", { type: "error" });
-      return;
-    }
-    const message = {
-      author: payload.username || wh.name,
-      avatar: payload.avatar_url || wh.avatar,
-      text: payload.content || "",
-      isBot: true,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      embeds: payload.embeds || []
-    };
-    emit("messageReceived", wh.channelId, message);
   }
 
   // ---------- EVENTS ----------
@@ -2021,6 +2075,7 @@
             const avImg = m.avatar ? `<img src="${m.avatar}">` : avText;
             const mentionStyle = m.isMentioned ? "background:rgba(242, 63, 67, 0.15); border-left:3px solid var(--foxy-mention);" : "";
             
+            // Build visual mock embeds for webhook-compatible messages
             let embedsHTML = "";
             if (m.embeds && m.embeds.length > 0) {
               embedsHTML = m.embeds.map(emb => `
@@ -2051,6 +2106,7 @@
           
           msgList.scrollTop = msgList.scrollHeight;
 
+          // Wire profile trigger callbacks on clicking username or avatar
           msgList.querySelectorAll(".foxy-chat-message").forEach(el => {
             const idx = parseInt(el.dataset.msgIdx);
             const m = list[idx];
@@ -2928,7 +2984,7 @@
 
   // ---------- EXPORT ----------
   window.FoxyUI = {
-    _version: 26,
+    _version: 27,
     _windows, _toasts, _settings, _plugins, _keybinds, _commands, _members, THEMES,
     getIcon,
     notify,
@@ -2950,7 +3006,7 @@
     executeWebhook
   };
   
-  console.log("%c🦊 FoxyUI v26 loaded — Premium Developer Layout Integrations Initialized", "color:#4296fa;font-weight:700;font-size:13px");
+  console.log("%c🦊 FoxyUI v27 loaded — Premium Developer Layout Integrations Initialized", "color:#4296fa;font-weight:700;font-size:13px");
 
   if (_settings.autoCheckUpdates) {
     setTimeout(() => {
