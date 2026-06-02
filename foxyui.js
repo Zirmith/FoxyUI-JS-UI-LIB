@@ -1,12 +1,12 @@
-/* FoxyUI v25 — Discord-flavored stateless UI library
+/* FoxyUI v26 — Discord-flavored & ImGui-flavored stateless UI library
  * Adds: Premium Animated Light and Animated Dark themes, fluid CSS gradient transition matrices,
  * customizable backdrop metrics, collapsible category sidebar accordions, non-blocking absolute tooltips, 
  * categorized command palettes, extensible Settings API wrappers, Webhook executors, 
- * hover profile cards, live voice-activity rings, and Connected Accounts dashboard.
+ * hover profile cards, live voice-activity rings, Connected Accounts dashboard, and modular ImGui developer layouts.
  */
 (() => {
-  if (window.FoxyUI && window.FoxyUI._version >= 25) {
-    console.warn("FoxyUI v25 already loaded~");
+  if (window.FoxyUI && window.FoxyUI._version >= 26) {
+    console.warn("FoxyUI v26 already loaded~");
     return;
   }
 
@@ -197,7 +197,7 @@
     mic: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`,
     micOff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 11a6.9 6.9 0 0 1-1.12 3.8"></path><path d="M19 10v1a7.9 7.9 0 0 1-.39 2.44"></path><path d="M5 10v2a7 7 0 0 0 7 7"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`,
     headset: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>`,
-    headsetOff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16 16v3a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path><path d="M3 12a9 9 0 0 1 15-6.7M21 12c0-1.8-.5-3.5-1.4-5"></path></svg>`,
+    headsetOff: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M16 16v3a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path><path d="M3 12a9 9 0 1 0 15-6.7M21 12c0-1.8-.5-3.5-1.4-5"></path></svg>`,
     compass: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>`,
     plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
     phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.5 19.5 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`,
@@ -831,6 +831,227 @@
         50% { transform: scale(1.15); opacity: 1; }
         100% { transform: scale(0.95); opacity: 0.6; }
       }
+
+      /* ==========================================================================
+         BRAND NEW SPECIALIZED DEAR IMGUI LAYOUT Presets
+         ========================================================================== */
+      .foxy-window.imgui-layout,
+      .foxy-window.imgui-layout * {
+        border-radius: 0px !important;
+      }
+      .foxy-window.imgui-layout {
+        border: 1px solid #5a5a5a;
+        background-color: rgba(30, 30, 30, 0.98);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+      }
+      .foxy-window.imgui-layout .foxy-header {
+        background: #2d2d2d;
+        border-bottom: 1px solid #3d3d3d;
+        padding: 4px 10px;
+        min-height: 28px;
+      }
+      .foxy-window.imgui-layout .foxy-title {
+        font-family: monospace;
+        font-size: 12px;
+        color: #fff;
+        font-weight: normal;
+      }
+      .foxy-window.imgui-layout .foxy-controls span {
+        font-size: 11px;
+        padding: 2px 6px;
+      }
+      
+      /* Modular ImGui Developer Navigation Menu bar */
+      .foxy-imgui-menubar {
+        background: #202020;
+        border-bottom: 1px solid #3d3d3d;
+        display: flex;
+        gap: 2px;
+        padding: 2px 6px;
+        font-size: 11px;
+        color: #dbdee1;
+        user-select: none;
+        position: relative;
+        font-family: monospace;
+        z-index: 10000000;
+      }
+      .foxy-imgui-menu-item {
+        cursor: pointer;
+        padding: 2px 8px;
+        position: relative;
+      }
+      .foxy-imgui-menu-item:hover, .foxy-imgui-menu-item.active {
+        background: #3e3e3e;
+        color: #fff;
+      }
+      .foxy-imgui-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #1e1e1e;
+        border: 1px solid #4a4a4a;
+        display: none;
+        flex-direction: column;
+        min-width: 140px;
+        z-index: 10000100;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+      }
+      .foxy-imgui-dropdown-item {
+        padding: 5px 12px;
+        cursor: pointer;
+        color: #cccccc;
+        font-family: monospace;
+        font-size: 11px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .foxy-imgui-dropdown-item:hover {
+        background: #4296fa;
+        color: #fff;
+      }
+      .foxy-imgui-dropdown-sep {
+        height: 1px;
+        background: #3a3a3a;
+        margin: 2px 0;
+      }
+
+      /* Workspace splits styling for ImGui Developer layout */
+      .foxy-imgui-explorer {
+        width: 180px;
+        background: #181818;
+        border-right: 1px solid #3d3d3d;
+        overflow-y: auto;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        font-size: 11px;
+        font-family: monospace;
+        color: #c5c5c5;
+      }
+      .foxy-imgui-inspector {
+        width: 190px;
+        background: #181818;
+        border-left: 1px solid #3d3d3d;
+        overflow-y: auto;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 11px;
+        font-family: monospace;
+        color: #c5c5c5;
+      }
+      .foxy-imgui-explorer-header, .foxy-imgui-inspector-header {
+        font-weight: bold;
+        color: #4296fa;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+        border-bottom: 1px solid #2a2a2a;
+        padding-bottom: 4px;
+      }
+      .foxy-imgui-tree-node {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 4px;
+        user-select: none;
+      }
+      .foxy-imgui-tree-node:hover {
+        background: #2a2a2a;
+        color: #fff;
+      }
+      .foxy-imgui-tree-node.selected {
+        background: rgba(66, 150, 250, 0.25);
+        border: 1px solid #4296fa;
+        color: #fff;
+      }
+      .foxy-imgui-tree-arrow {
+        color: #7a7a7a;
+        font-size: 8px;
+        width: 10px;
+        display: inline-block;
+        text-align: center;
+      }
+      .foxy-imgui-tree-node-children {
+        padding-left: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .foxy-imgui-tree-node-children.collapsed {
+        display: none;
+      }
+      .foxy-imgui-prop-row {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #222;
+      }
+      .foxy-imgui-prop-label {
+        color: #8a8a8a;
+        font-size: 10px;
+      }
+      .foxy-imgui-prop-value {
+        width: 100% !important;
+        font-size: 11px !important;
+        font-family: monospace !important;
+        background: #222 !important;
+        border: 1px solid #3c3c3c !important;
+        color: #fff !important;
+        padding: 2px 4px !important;
+        box-sizing: border-box !important;
+      }
+      .foxy-imgui-prop-value:focus {
+        border-color: #4296fa !important;
+      }
+
+      /* Sharp overrides for elements in ImGui workspaces */
+      .foxy-window.imgui-layout .foxy-tab {
+        font-family: monospace;
+        font-size: 11px;
+        padding: 4px 8px;
+        background: #242424;
+        border: 1px solid #333;
+        border-bottom: none;
+        margin-right: 2px;
+      }
+      .foxy-window.imgui-layout .foxy-tabbar {
+        background: #1c1c1c;
+        padding: 4px 4px 0 4px;
+      }
+      .foxy-window.imgui-layout .foxy-tab.active {
+        background: #323232;
+        border-color: #5a5a5a;
+        color: #4296fa;
+        font-weight: bold;
+      }
+      .foxy-window.imgui-layout .foxy-content {
+        background: #1c1c1c;
+        border: 1px solid #333;
+        margin: 4px;
+      }
+      .foxy-window.imgui-layout .foxy-footer {
+        background: #252525;
+        border-top: 1px solid #3d3d3d;
+        padding: 4px 8px;
+      }
+      .foxy-window.imgui-layout button {
+        background: #3f3f46;
+        border: 1px solid #5a5a5a;
+        color: #fff;
+        font-family: monospace;
+        font-size: 11px;
+        padding: 3px 10px;
+      }
+      .foxy-window.imgui-layout button:hover {
+        background: #4f4f58;
+        border-color: #4296fa;
+      }
     `;
   }
   applyStyle();
@@ -889,7 +1110,6 @@
     const bannerStyle = user.bannerColor ? `background:${user.bannerColor}` : `background:var(--foxy-accent)`;
     const bgCol = stringToColor(user.name);
     
-    // Compile active connected accounts badges list
     let badgesHTML = "";
     if (user.isBot) badgesHTML += `<span class="foxy-profile-card-badge-pill" style="background:var(--foxy-accent)">BOT</span>`;
     if (user.connectedAccounts) {
@@ -933,7 +1153,6 @@
     document.body.appendChild(card);
     card.style.left = x + "px"; card.style.top = y + "px";
     
-    // Clamp coordinates to client viewport boundary metrics
     const r = card.getBoundingClientRect();
     if (r.right > innerWidth) card.style.left = (innerWidth - r.width - 12) + "px";
     if (r.bottom > innerHeight) card.style.top = (innerHeight - r.height - 12) + "px";
@@ -1225,7 +1444,7 @@
         return null;
       }
 
-      const localVersion = window.FoxyUI ? window.FoxyUI._version : 25;
+      const localVersion = window.FoxyUI ? window.FoxyUI._version : 26;
       const updateAvailable = remoteVersion > localVersion;
 
       let changelog = [];
@@ -1335,6 +1554,7 @@
       resizable = true, movable = true, minimizable = true, defaultTab = 0,
       servers = null, channels = null, members = false, memberList = null,
       layout = null, tabs = null, currentUser = null,
+      explorerItems = null, inspectorProperties = null,
       onClose, onOpen
     } = options;
 
@@ -1373,6 +1593,10 @@
 
     const el = document.createElement("div");
     el.className = "foxy-window";
+    if (layout === "imgui") {
+      el.classList.add("imgui-layout");
+    }
+    
     el.style.width = width + "px"; el.style.height = height + "px";
     el.style.left = (80 + Object.keys(_windows).length * 30) + "px";
     el.style.top = (80 + Object.keys(_windows).length * 30) + "px";
@@ -1392,8 +1616,46 @@
           <span class="close" title="Close">${getIcon("close", {size:14})}</span>
         </div>
       </div>
+      ${layout === "imgui" ? `
+        <div class="foxy-imgui-menubar">
+          <div class="foxy-imgui-menu-item" data-menu="file">File
+            <div class="foxy-imgui-dropdown" id="imgui-menu-file">
+              <div class="foxy-imgui-dropdown-item cmd-new-window">New Window <span>Ctrl+N</span></div>
+              <div class="foxy-imgui-dropdown-sep"></div>
+              <div class="foxy-imgui-dropdown-item cmd-close-client">Close Client</div>
+            </div>
+          </div>
+          <div class="foxy-imgui-menu-item" data-menu="view">View
+            <div class="foxy-imgui-dropdown" id="imgui-menu-view">
+              <div class="foxy-imgui-dropdown-item cmd-console">Developer Console</div>
+              <div class="foxy-imgui-dropdown-item cmd-reset">Reset Layout</div>
+            </div>
+          </div>
+          <div class="foxy-imgui-menu-item" data-menu="theme">Theme
+            <div class="foxy-imgui-dropdown" id="imgui-menu-theme">
+              <div class="foxy-imgui-dropdown-item cmd-theme-imgui">ImGui Classic</div>
+              <div class="foxy-imgui-dropdown-item cmd-theme-dark">Classic Dark</div>
+              <div class="foxy-imgui-dropdown-item cmd-theme-light">Classic Light</div>
+              <div class="foxy-imgui-dropdown-item cmd-theme-amoled">AMOLED</div>
+              <div class="foxy-imgui-dropdown-item cmd-theme-cyber">Cyberpunk</div>
+            </div>
+          </div>
+          <div class="foxy-imgui-menu-item" data-menu="help">Help
+            <div class="foxy-imgui-dropdown" id="imgui-menu-help">
+              <div class="foxy-imgui-dropdown-item cmd-about">About FoxyUI</div>
+              <div class="foxy-imgui-dropdown-item cmd-changelog">Changelog</div>
+            </div>
+          </div>
+        </div>
+      ` : ''}
       <div class="foxy-body">
         ${finalServers ? '<div class="foxy-server-rail"></div>' : ''}
+        ${layout === "imgui" ? `
+          <div class="foxy-imgui-explorer">
+            <div class="foxy-imgui-explorer-header">Workspace Hierarchy</div>
+            <div class="foxy-imgui-explorer-tree"></div>
+          </div>
+        ` : ''}
         ${finalChannels ? `
           <div class="foxy-channel-list">
             <div class="foxy-channel-header"></div>
@@ -1407,6 +1669,12 @@
           <div class="foxy-content"></div>
           <div class="foxy-footer"></div>
         </div>
+        ${layout === "imgui" ? `
+          <div class="foxy-imgui-inspector">
+            <div class="foxy-imgui-inspector-header">Properties</div>
+            <div class="foxy-imgui-inspector-props"></div>
+          </div>
+        ` : ''}
         ${finalMembers ? '<div class="foxy-member-list"></div>' : ''}
       </div>
     `;
@@ -1422,6 +1690,8 @@
       serverRail: el.querySelector(".foxy-server-rail"),
       channelList: el.querySelector(".foxy-channel-list"),
       memberListEl: el.querySelector(".foxy-member-list"),
+      explorerEl: el.querySelector(".foxy-imgui-explorer-tree"),
+      inspectorEl: el.querySelector(".foxy-imgui-inspector-props"),
 
       setTitle(t) { this.title = t; el.querySelector(".foxy-title").textContent = t; },
       setContent(html) { if (typeof html === "string") this.content.innerHTML = html; else { this.content.innerHTML = ""; this.content.appendChild(html); } },
@@ -1751,7 +2021,6 @@
             const avImg = m.avatar ? `<img src="${m.avatar}">` : avText;
             const mentionStyle = m.isMentioned ? "background:rgba(242, 63, 67, 0.15); border-left:3px solid var(--foxy-mention);" : "";
             
-            // Build visual mock embeds for webhook-compatible messages
             let embedsHTML = "";
             if (m.embeds && m.embeds.length > 0) {
               embedsHTML = m.embeds.map(emb => `
@@ -1782,7 +2051,6 @@
           
           msgList.scrollTop = msgList.scrollHeight;
 
-          // Wire profile trigger callbacks on clicking username or avatar
           msgList.querySelectorAll(".foxy-chat-message").forEach(el => {
             const idx = parseInt(el.dataset.msgIdx);
             const m = list[idx];
@@ -2120,14 +2388,26 @@
             return `
               <h2 style="margin-top:0; font-size:20px; font-weight:700">Changelog — Version History</h2>
               <div style="margin-top:20px; display:flex; flex-direction:column; gap:20px">
+                 <div>
+                  <div style="background:var(--foxy-accent); color:#fff; display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v26.0 Developer Release</div>
+                  <h3 style="margin:0 0 6px 0; font-size:16px">Immediate-Mode ImGui Layout Integrations</h3>
+                  <p style="color:var(--foxy-text-muted); font-size:14px; margin:0 0 8px 0">Released on June 2, 2026.</p>
+                  <ul style="margin:0; padding-left:20px; color:var(--foxy-text); font-size:13px; line-height:1.6">
+                    <li><strong>Dear ImGui Layout Split Preset:</strong> Activates sharp 0px structural profiles and custom developer splits.</li>
+                    <li><strong>Cascading Menu bar:</strong> Functional dropdown cascades linking custom workspace actions.</li>
+                    <li><strong>Visual Hierarchy Explorer:</strong> Interactive collapsible parent-child Tree-Node workspace maps.</li>
+                    <li><strong>Live Properties Inspector:</strong> Immediate-mode console attribute editors with live callbacks.</li>
+                  </ul>
+                </div>
+                <hr style="border:0; border-top:1px solid var(--foxy-divider); margin:10px 0">
                 <div>
-                  <div style="background:var(--foxy-accent); color:#fff; display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v25.0 Major Overhaul</div>
+                  <div style="background:var(--foxy-surface-alt); color:var(--foxy-text-muted); display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:uppercase; margin-bottom:8px">v25.0 Major Overhaul</div>
                   <h3 style="margin:0 0 6px 0; font-size:16px">Integrations, Webhooks, Profile Cards & Audio Feedback</h3>
                   <p style="color:var(--foxy-text-muted); font-size:14px; margin:0 0 8px 0">Released on June 2, 2026.</p>
                   <ul style="margin:0; padding-left:20px; color:var(--foxy-text); font-size:13px; line-height:1.6">
-                    <li><strong>Webhook Pipeline:</strong> Complete support for dispatching mock webhook requests and embedding elements into open channel feeds.</li>
+                    <li><strong>Webhook Pipeline:</strong> Dispatching mock webhook requests and embedding elements directly into open channel feeds.</li>
                     <li><strong>Interactive Profile Cards:</strong> Floating user cards triggered by clicking chat usernames or avatars.</li>
-                    <li><strong>Connected Accounts:</strong> Link GitHub, Twitch, and YouTube credentials.</li>
+                    <li><strong>Connected Accounts:</strong> Link GitHub, Twitch, and YouTube credentials to local profile entities.</li>
                     <li><strong>Audio Speaking Ring:</strong> Speaking-state toggle visual animations around active speakers.</li>
                   </ul>
                 </div>
@@ -2143,9 +2423,9 @@
                 <h3 style="margin-top:0; font-size:14px; font-weight:700; text-transform:uppercase; color:var(--foxy-accent)">Technical Credits</h3>
                 <p style="margin:0; font-size:13px; line-height:1.6; color:var(--foxy-text)">
                   <strong>Core Architecture:</strong> FoxyUI Developer & Open Source Contributors<br>
-                  <strong>Release Version:</strong> v25.0.0 (Stateless Engine)<br>
+                  <strong>Release Version:</strong> v26.0.0 (Stateless Engine)<br>
                   <strong>License:</strong> MIT Open Source License<br>
-                  <strong>Aesthetics:</strong> Inspired by Discord design specifications
+                  <strong>Aesthetics:</strong> Inspired by Discord & Dear ImGui layout specifications
                 </p>
               </div>
             `;
@@ -2323,6 +2603,89 @@
           }
         });
       },
+
+      /* ImGui Layout Specific Control APIs */
+      setExplorerItems(nodes) {
+        if (!this.explorerEl) return;
+        this.explorerEl.innerHTML = "";
+        
+        const buildTreeHTML = (node) => {
+          const hasChildren = node.children && node.children.length > 0;
+          const arrow = hasChildren ? "▼" : "•";
+          const nodeId = node.id || "node_" + Math.random().toString(36).slice(2, 6);
+          let html = `
+            <div class="foxy-imgui-tree-container">
+              <div class="foxy-imgui-tree-node" data-id="${nodeId}">
+                <span class="foxy-imgui-tree-arrow">${arrow}</span>
+                <span class="foxy-imgui-tree-label">${node.label}</span>
+              </div>
+          `;
+          if (hasChildren) {
+            html += `<div class="foxy-imgui-tree-node-children" id="children-${nodeId}">`;
+            node.children.forEach(child => {
+              html += buildTreeHTML(child);
+            });
+            html += `</div>`;
+          }
+          html += `</div>`;
+          return html;
+        };
+
+        let finalHTML = "";
+        nodes.forEach(n => {
+          finalHTML += buildTreeHTML(n);
+        });
+        this.explorerEl.innerHTML = finalHTML;
+
+        // Wire expand, collapse, and select callback actions
+        this.explorerEl.querySelectorAll(".foxy-imgui-tree-node").forEach(nodeEl => {
+          nodeEl.onclick = (e) => {
+            e.stopPropagation();
+            this.explorerEl.querySelectorAll(".foxy-imgui-tree-node").forEach(n => n.classList.remove("selected"));
+            nodeEl.classList.add("selected");
+
+            const childContainer = this.explorerEl.querySelector(`#children-${nodeEl.dataset.id}`);
+            if (childContainer) {
+              const collapsed = childContainer.classList.toggle("collapsed");
+              nodeEl.querySelector(".foxy-imgui-tree-arrow").textContent = collapsed ? "▶" : "▼";
+            }
+            
+            // Search node payload context matching event triggers
+            const findAndEmit = (arr) => {
+              for (let node of arr) {
+                if (node.id === nodeEl.dataset.id || node.label === nodeEl.querySelector(".foxy-imgui-tree-label").textContent) {
+                  node.onClick?.(node);
+                  emit("imguiNodeClicked", winAPI, node);
+                  return true;
+                }
+                if (node.children && findAndEmit(node.children)) return true;
+              }
+              return false;
+            };
+            findAndEmit(nodes);
+          };
+        });
+      },
+      setInspectorProperties(props) {
+        if (!this.inspectorEl) return;
+        this.inspectorEl.innerHTML = "";
+        props.forEach(p => {
+          const row = document.createElement("div");
+          row.className = "foxy-imgui-prop-row";
+          row.innerHTML = `
+            <span class="foxy-imgui-prop-label">${p.label}</span>
+            <input class="foxy-imgui-prop-value" type="${p.type || 'text'}" value="${p.value}">
+          `;
+          const input = row.querySelector("input");
+          input.oninput = (e) => {
+            p.value = e.target.value;
+            p.onChange?.(e.target.value, winAPI);
+            emit("imguiPropChanged", winAPI, p);
+          };
+          this.inspectorEl.appendChild(row);
+        });
+      },
+
       close() {
         delete _windows[id]; el.remove();
         emit("windowClosed", winAPI); onClose?.();
@@ -2369,6 +2732,90 @@
       };
     }
 
+    // Modular Immediate-mode drop-down cascade logic for ImGui layout Menu bar
+    if (layout === "imgui") {
+      const menubar = el.querySelector(".foxy-imgui-menubar");
+      const menuItems = menubar.querySelectorAll(".foxy-imgui-menu-item");
+      const dropdowns = menubar.querySelectorAll(".foxy-imgui-dropdown");
+
+      const closeAllDropdowns = () => {
+        dropdowns.forEach(d => d.style.display = "none");
+        menuItems.forEach(item => item.classList.remove("active"));
+      };
+
+      menuItems.forEach(item => {
+        item.onclick = (e) => {
+          e.stopPropagation();
+          const targetDropdown = item.querySelector(".foxy-imgui-dropdown");
+          const isCurrentlyVisible = targetDropdown.style.display === "flex";
+          closeAllDropdowns();
+          if (!isCurrentlyVisible) {
+            targetDropdown.style.display = "flex";
+            item.classList.add("active");
+          }
+        };
+      });
+
+      document.addEventListener("click", closeAllDropdowns);
+
+      // Map built-in functional drop-down menu command triggers
+      menubar.querySelector(".cmd-new-window")?.addEventListener("click", () => {
+        createWindow({ title: "New Developer Window", layout: "imgui" });
+      });
+      menubar.querySelector(".cmd-close-client")?.addEventListener("click", () => {
+        winAPI.close();
+      });
+      menubar.querySelector(".cmd-console")?.addEventListener("click", () => {
+        openCommandPalette();
+      });
+      menubar.querySelector(".cmd-reset")?.addEventListener("click", () => {
+        el.style.width = width + "px";
+        el.style.height = height + "px";
+        el.style.left = "100px";
+        el.style.top = "100px";
+        showToast("ImGui Workspace layout reset.");
+      });
+      menubar.querySelector(".cmd-theme-imgui")?.addEventListener("click", () => setTheme("imgui"));
+      menubar.querySelector(".cmd-theme-dark")?.addEventListener("click", () => setTheme("dark"));
+      menubar.querySelector(".cmd-theme-light")?.addEventListener("click", () => setTheme("light"));
+      menubar.querySelector(".cmd-theme-amoled")?.addEventListener("click", () => setTheme("amoled"));
+      menubar.querySelector(".cmd-theme-cyber")?.addEventListener("click", () => setTheme("cyberpunk"));
+      
+      menubar.querySelector(".cmd-about")?.addEventListener("click", () => {
+        showModal({
+          title: "About FoxyUI",
+          body: "<div><strong>FoxyUI v26.0 Developer Edition</strong><br><br>An optimized, immediate-mode compatible web desktop client framework utilizing stateless layouts.</div>"
+        });
+      });
+      menubar.querySelector(".cmd-changelog")?.addEventListener("click", () => {
+        showModal({
+          title: "v26.0 Changelog",
+          body: "<div>- Implemented structural modular ImGui developer panels.<br>- Added cascading Menu Bar dropdown routing API.<br>- Created hierarchical workspace explorer tree-nodes.<br>- Released raw 0px Immediate-Mode window overrides.</div>"
+        });
+      });
+
+      // Default mock developer values if properties are not provided
+      if (explorerItems) {
+        winAPI.setExplorerItems(explorerItems);
+      } else {
+        winAPI.setExplorerItems([
+          { label: "Assets", children: [{ label: "materials" }, { label: "textures" }] },
+          { label: "Scenes", children: [{ label: "level1.json" }, { label: "level2.json" }] },
+          { label: "Scripts", children: [{ label: "PlayerController.js" }, { label: "PhysicsSolver.js" }] }
+        ]);
+      }
+
+      if (inspectorProperties) {
+        winAPI.setInspectorProperties(inspectorProperties);
+      } else {
+        winAPI.setInspectorProperties([
+          { label: "Window Title", value: title, onChange: (val) => winAPI.setTitle(val) },
+          { label: "Width (px)", value: width, onChange: (val) => el.style.width = val + "px" },
+          { label: "Height (px)", value: height, onChange: (val) => el.style.height = val + "px" }
+        ]);
+      }
+    }
+
     el.querySelector(".close").onclick = () => winAPI.close();
     if (minimizable) el.querySelector(".minimize").onclick = () => {
       const body = el.querySelector(".foxy-body");
@@ -2381,7 +2828,7 @@
       const header = el.querySelector(".foxy-header");
       let offsetX = 0, offsetY = 0, dragging = false;
       header.addEventListener("mousedown", e => {
-        if (e.target.closest(".foxy-controls")) return;
+        if (e.target.closest(".foxy-controls") || e.target.closest(".foxy-imgui-menubar")) return;
         dragging = true; offsetX = e.clientX - el.offsetLeft; offsetY = e.clientY - el.offsetTop;
         el.style.zIndex = 999999 + Object.keys(_windows).length;
       });
@@ -2477,11 +2924,11 @@
   registerCommand({ id: "theme.nebula", label: "Theme: Nebula (Animated)", category: "Appearance", onRun: () => setTheme("nebula") });
   registerCommand({ id: "theme.twitch", label: "Theme: Twitch", category: "Appearance", onRun: () => setTheme("twitch") });
   registerCommand({ id: "theme.imgui", label: "Theme: ImGui", category: "Appearance", onRun: () => setTheme("imgui") });
-  registerCommand({ id: "toast.demo", label: "Show demo toast", category: "Utility", onRun: () => showToast("Hello from FoxyUI v25", { type: "success" }) });
+  registerCommand({ id: "toast.demo", label: "Show demo toast", category: "Utility", onRun: () => showToast("Hello from FoxyUI v26", { type: "success" }) });
 
   // ---------- EXPORT ----------
   window.FoxyUI = {
-    _version: 25,
+    _version: 26,
     _windows, _toasts, _settings, _plugins, _keybinds, _commands, _members, THEMES,
     getIcon,
     notify,
@@ -2503,7 +2950,7 @@
     executeWebhook
   };
   
-  console.log("%c🦊 FoxyUI v25 loaded — Premium Integrations & Profile Engines Initialized", "color:#5865f2;font-weight:700;font-size:13px");
+  console.log("%c🦊 FoxyUI v26 loaded — Premium Developer Layout Integrations Initialized", "color:#4296fa;font-weight:700;font-size:13px");
 
   if (_settings.autoCheckUpdates) {
     setTimeout(() => {
