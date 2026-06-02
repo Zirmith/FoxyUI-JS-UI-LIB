@@ -3003,7 +3003,7 @@
     
     // Webhook Pipelines
     registerWebhook,
-    executeWebhook
+    
   };
   
   console.log("%c🦊 FoxyUI v27 loaded — Premium Developer Layout Integrations Initialized", "color:#4296fa;font-weight:700;font-size:13px");
