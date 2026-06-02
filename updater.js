@@ -1,6 +1,6 @@
 /**
  * FoxyUI-JS-UI-LIB Update Metadata (updater.js)
- * @version 23.0
+ * @version 25.0
  * 
  * This file serves as the official metadata and version reference for FoxyUI.
  * The client library parses this file both statically (via regex) and dynamically (via execution).
@@ -11,9 +11,9 @@
 
   const updateMeta = {
     // Core version metrics (increment these when pushing updates to foxyui.js)
-    version: 23.0,
-    semver: "23.0.0",
-    releaseDate: "2026-05-30",
+    version: 25.0,
+    semver: "25.0.0",
+    releaseDate: "2026-06-02",
     
     // Distribution and update tracking points
     updateURL: "https://raw.githubusercontent.com/Zirmith/FoxyUI-JS-UI-LIB/refs/heads/main/foxyui.js",
@@ -21,16 +21,17 @@
     
     // Update manifest for changelog population
     changelog: [
-      "Animated Dark & Light Themes implemented with fluid ambient shifting matrices.",
-      "Accordion Navigation Sidebar added to clean up server and channel categories.",
-      "Global absolute non-blocking hover tooltips deployed.",
-      "Integrated local inbox and notification routing pipelines.",
-      "Custom updates panel and manual check action added directly inside client settings."
+      "Webhook & Integrations pipeline implemented with custom payloads, profile overrides, and dynamic embed blocks.",
+      "Special visual treatments introduced for automated feeds, including a dedicated BOT tag.",
+      "Interactive Discord-style floating profile popouts added for user avatars and chat author cards.",
+      "Connected accounts dashboard designed for linking external social profiles like GitHub, Twitch, and YouTube.",
+      "Voice ring state indicators deployed to highlight active speaking status visually.",
+      "Expanded status customizer supporting custom status, activities, bios, and banner colors."
     ],
 
     /**
      * Helper to compare a running local client version against this remote metadata.
-     * Supports both legacy numbers (e.g., 23.0) and SemVer strings (e.g., "23.0.0").
+     * Supports both legacy numbers (e.g., 25.0) and SemVer strings (e.g., "25.0.0").
      * 
      * @param {number|string} localVersion - The running client library version.
      * @returns {boolean} True if the remote version is strictly newer.
